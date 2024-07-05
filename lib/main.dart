@@ -29,7 +29,7 @@ const List<String> scopes = <String>[
 GoogleSignIn _googleSignIn = GoogleSignIn(
   // Optional clientId
   // clientId:
-  //     '97363559343-srgabdng0efon544o96st67apef0cg6a.apps.googleusercontent.com',
+  //     '975071060042-06pc5s1lpt88flkoe5no2j1hsnm7nc88.apps.googleusercontent.com',
   scopes: scopes,
 );
 
@@ -112,13 +112,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleGoogleSignIn() async {
     try {
       await _googleSignIn.signIn();
-      print("YAY@");
       if (_googleSignIn.currentUser != null) {
         // Get the Google token
-        print(_googleSignIn.currentUser);
         final googleAuth = await _googleSignIn.currentUser!.authentication;
-
-        print("Yay");
 
         // Send the token to your backend to verify and create a session
         final response = await http.post(
@@ -130,9 +126,11 @@ class _LoginScreenState extends State<LoginScreen> {
             'token': googleAuth.idToken!,
           }),
         );
+        final user_info = jsonDecode(response.body);
+        print(response.body);
+        print(response.statusCode);
 
         if (response.statusCode == 200) {
-          final user_info = jsonDecode(response.body);
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -141,7 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     )),
           );
         } else if (response.statusCode == 201) {
-          final user_info = jsonDecode(response.body);
           Navigator.push(
             context,
             MaterialPageRoute(

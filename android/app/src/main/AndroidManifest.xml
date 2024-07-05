@@ -6,7 +6,7 @@
 
         <meta-data
             android:name="com.google.android.gms.auth.api.signin.OAUTH_CLIENT_ID"
-            android:value="32011394232-g48tj7ct06e8qgp29ck3nt18ph20ahg9.apps.googleusercontent.com"/>
+            android:value="975071060042-06pc5s1lpt88flkoe5no2j1hsnm7nc88.apps.googleusercontent.com"/>
 
         <activity
             android:name=".MainActivity"

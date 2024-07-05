@@ -35,6 +35,8 @@ class _GoogleSignUpScreenState extends State<GoogleSignUpScreen> {
       String email = _emailController.text;
       String phone = _phoneController.text;
 
+      print(googleId);
+
       // 서버로 회원가입 요청을 보내고 응답을 처리합니다.
       final response = await http.post(
         Uri.parse('https://172.10.7.95/api/signup'),
