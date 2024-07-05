@@ -277,10 +277,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       },
                       child: Text(
                         'Forgot Password?',
-                        style: TextStyle(
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
+                        style: TextStyle(color: Colors.blueGrey, fontSize: 15),
                       ),
                     ),
                   ),
@@ -292,13 +289,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     foregroundColor: Colors.white,
                     backgroundColor: Colors.black,
                     padding: EdgeInsets.symmetric(
-                        vertical: MediaQuery.of(context).size.height * 0.025),
+                        vertical: MediaQuery.of(context).size.height * 0.022),
                     minimumSize: Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0), // 꼭짓점 반지름 조정
                     ),
                   ),
-                  child: Text('Login'),
+                  child: Text(
+                    'Login',
+                    style: TextStyle(fontSize: 16),
+                  ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.025),
                 Row(
@@ -310,7 +310,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       padding: EdgeInsets.symmetric(horizontal: 16.0),
                       child: Text(
                         'Or login with',
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: Colors.grey, fontSize: 16),
                       ),
                     ),
                     Expanded(
@@ -334,17 +334,16 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: RichText(
                     text: TextSpan(
                       text: "Don't have an account? ",
-                      style: TextStyle(color: Colors.black),
+                      style: TextStyle(color: Colors.black, fontSize: 16),
                       children: <TextSpan>[
                         TextSpan(
                           text: 'Register Now',
-                          style: TextStyle(color: Colors.teal),
+                          style: TextStyle(color: Colors.teal, fontSize: 16),
                         ),
                       ],
                     ),
                   ),
                 ),
-                Spacer(flex: 1),
               ],
             ),
           ),
