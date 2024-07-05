@@ -3,6 +3,11 @@
         android:label="madcamp_week2"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+
+        <meta-data
+            android:name="com.google.android.gms.auth.api.signin.32011394232-g48tj7ct06e8qgp29ck3nt18ph20ahg9.apps.googleusercontent.com"
+            android:value="32011394232-g48tj7ct06e8qgp29ck3nt18ph20ahg9.apps.googleusercontent.com"/>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"

@@ -112,9 +112,12 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _handleGoogleSignIn() async {
     try {
       await _googleSignIn.signIn();
+      print("YAY@");
       if (_googleSignIn.currentUser != null) {
         // Get the Google token
         final googleAuth = await _googleSignIn.currentUser!.authentication;
+
+        print("Yay");
 
         // Send the token to your backend to verify and create a session
         final response = await http.post(
