@@ -29,7 +29,7 @@ const List<String> scopes = <String>[
 GoogleSignIn _googleSignIn = GoogleSignIn(
   // Optional clientId
   // clientId:
-  //     '32011394232-g48tj7ct06e8qgp29ck3nt18ph20ahg9.apps.googleusercontent.com',
+  //     '97363559343-srgabdng0efon544o96st67apef0cg6a.apps.googleusercontent.com',
   scopes: scopes,
 );
 
@@ -115,6 +115,7 @@ class _LoginScreenState extends State<LoginScreen> {
       print("YAY@");
       if (_googleSignIn.currentUser != null) {
         // Get the Google token
+        print(_googleSignIn.currentUser);
         final googleAuth = await _googleSignIn.currentUser!.authentication;
 
         print("Yay");

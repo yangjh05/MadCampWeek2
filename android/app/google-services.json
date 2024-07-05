@@ -1,9 +1,29 @@
 {
-  "installed": {
-    "client_id": "32011394232-g48tj7ct06e8qgp29ck3nt18ph20ahg9.apps.googleusercontent.com",
-    "project_id": "autonomous-rite-428503-k7",
-    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-    "token_uri": "https://oauth2.googleapis.com/token",
-    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs"
-  }
+  "project_info": {
+    "project_number": "975071060042",
+    "project_id": "madcamp-week2-6fb88",
+    "storage_bucket": "madcamp-week2-6fb88.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:975071060042:android:0285ac8cf13ba57fed86b3",
+        "android_client_info": {
+          "package_name": "com.example.madcamp_week2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBIIGGgO8bBRe-yN5-uvkUDrwOkUQH6r28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
 }
