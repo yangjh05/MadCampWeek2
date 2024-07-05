@@ -205,146 +205,157 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Spacer(flex: 2),
-                Image.asset(
-                  'assets/logo.png',
-                  width: MediaQuery.of(context).size.width * 0.77,
-                  height: MediaQuery.of(context).size.width * 0.77,
-                ),
-                Spacer(flex: 1),
-                Container(
-                  child: TextFormField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      hintText: 'Enter your ID',
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: MediaQuery.of(context).size.height * 0.02),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter your username';
-                      }
-                      return null;
-                    },
+      backgroundColor: Colors.white,
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            padding: EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Spacer(flex: 2),
+                  Image.asset(
+                    'assets/logo.png',
+                    width: MediaQuery.of(context).size.width * 0.77,
+                    height: MediaQuery.of(context).size.width * 0.77,
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.012),
-                Container(
-                  child: TextFormField(
-                      obscureText: _obscureText,
-                      controller: _passwordController,
+                  Spacer(flex: 1),
+                  Container(
+                    child: TextFormField(
+                      controller: _usernameController,
                       decoration: InputDecoration(
-                        hintText: 'Enter your password',
+                        hintText: 'Enter your ID',
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(
                             horizontal: 16.0,
                             vertical:
                                 MediaQuery.of(context).size.height * 0.02),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _obscureText
-                                ? Icons.visibility
-                                : Icons.visibility_off,
-                          ),
-                          onPressed: _togglePasswordVisibility,
-                        ),
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your password';
+                          return 'Please enter your username';
                         }
                         return null;
-                      }),
-                ),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                    padding: EdgeInsets.only(top: 8.0),
-                    child: GestureDetector(
-                      onTap: () {
-                        // 여기에 Forgot Password? 클릭 이벤트 추가
                       },
-                      child: Text(
-                        'Forgot Password?',
-                        style: TextStyle(color: Colors.blueGrey, fontSize: 15),
-                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
-                ElevatedButton(
-                  onPressed: _login,
-                  style: ElevatedButton.styleFrom(
-                    foregroundColor: Colors.white,
-                    backgroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(
-                        vertical: MediaQuery.of(context).size.height * 0.022),
-                    minimumSize: Size(double.infinity, 50),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0), // 꼭짓점 반지름 조정
-                    ),
-                  ),
-                  child: Text(
-                    'Login',
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                Row(
-                  children: <Widget>[
-                    Expanded(
-                      child: Divider(color: Colors.grey),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0),
-                      child: Text(
-                        'Or login with',
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(color: Colors.grey),
-                    ),
-                  ],
-                ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.025),
-                GestureDetector(
-                  onTap: _handleGoogleSignIn,
-                  child: Container(
-                    child: Image.asset(
-                      'assets/google_logo.png', // 구글 로고 이미지 경로
-                      height: 50.0,
-                    ),
-                  ),
-                ),
-                Spacer(flex: 2),
-                GestureDetector(
-                  onTap: _newUser,
-                  child: RichText(
-                    text: TextSpan(
-                      text: "Don't have an account? ",
-                      style: TextStyle(color: Colors.black, fontSize: 16),
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: 'Register Now',
-                          style: TextStyle(color: Colors.teal, fontSize: 16),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.012),
+                  Container(
+                    child: TextFormField(
+                        obscureText: _obscureText,
+                        controller: _passwordController,
+                        decoration: InputDecoration(
+                          hintText: 'Enter your password',
+                          border: OutlineInputBorder(),
+                          contentPadding: EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                              vertical:
+                                  MediaQuery.of(context).size.height * 0.02),
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscureText
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                            ),
+                            onPressed: _togglePasswordVisibility,
+                          ),
                         ),
-                      ],
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          return null;
+                        }),
+                  ),
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: Padding(
+                      padding: EdgeInsets.only(top: 8.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          // 여기에 Forgot Password? 클릭 이벤트 추가
+                        },
+                        child: Text(
+                          'Forgot Password?',
+                          style:
+                              TextStyle(color: Colors.blueGrey, fontSize: 15),
+                        ),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.03),
+                  ElevatedButton(
+                    onPressed: _login,
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Color(0xff495ECA),
+                      padding: EdgeInsets.symmetric(
+                          vertical: MediaQuery.of(context).size.height * 0.022),
+                      minimumSize: Size(double.infinity, 50),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0), // 꼭짓점 반지름 조정
+                      ),
+                    ),
+                    child: Text(
+                      'Login',
+                      style: TextStyle(fontSize: 16),
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.025),
+                  Row(
+                    children: <Widget>[
+                      Expanded(
+                        child: Divider(color: Colors.grey),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Text(
+                          'Or login with',
+                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(color: Colors.grey),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.025),
+                  GestureDetector(
+                    onTap: _handleGoogleSignIn,
+                    child: Container(
+                      child: Image.asset(
+                        'assets/google_logo.png', // 구글 로고 이미지 경로
+                        height: 50.0,
+                      ),
+                    ),
+                  ),
+                  Spacer(flex: 2),
+                  GestureDetector(
+                    onTap: _newUser,
+                    child: RichText(
+                      text: TextSpan(
+                        text: "Don't have an account? ",
+                        style: TextStyle(color: Colors.black, fontSize: 16),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: 'Register Now',
+                            style: TextStyle(
+                                color: Color(0xff495ECA), fontSize: 16),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                ],
+              ),
             ),
           ),
         ),
