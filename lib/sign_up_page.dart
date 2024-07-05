@@ -69,10 +69,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _usernameController,
-                decoration: InputDecoration(labelText: 'Username'),
+                decoration: InputDecoration(labelText: 'ID'),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your username';
+                    return 'Please enter your user ID';
                   }
                   return null;
                 },

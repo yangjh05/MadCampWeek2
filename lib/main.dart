@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:madcamp_week2/google_sign_up_page.dart';
 import 'home.dart'; // HomeScreen을 정의한 파일
 import 'sign_up_page.dart'; // SignUpScreen을 정의한 파일
 import 'package:google_sign_in/google_sign_in.dart';
@@ -139,15 +138,48 @@ class _LoginScreenState extends State<LoginScreen> {
                     )),
           );
         } else if (response.statusCode == 201) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => GoogleSignUpScreen(
-                      googleId: user_info['googleId'],
-                      email: user_info['email'],
-                      username: user_info['name'],
-                    )),
+          final response = await http.post(
+            Uri.parse('https://172.10.7.95/api/signup'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'userid': user_info['email'],
+              'password': user_info['googleId'],
+              'name': user_info['username'],
+              'googleId': user_info['googleId'],
+              'email': user_info['email'],
+            }),
           );
+
+          final googleAuth = await _googleSignIn.currentUser!.authentication;
+
+          // Send the token to your backend to verify and create a session
+          final new_response = await http.post(
+            Uri.parse('https://172.10.7.95/api/google_login'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'token': googleAuth.idToken!,
+            }),
+          );
+          final new_user_info = jsonDecode(response.body);
+          if (new_response.statusCode == 200) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => HomeScreen(
+                        user_info: new_user_info['user'],
+                      )),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                  content:
+                      Text('Second Google login failed: ${new_response.body}')),
+            );
+          }
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Google login failed: ${response.body}')),
