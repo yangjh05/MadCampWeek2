@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'home.dart'; // HomeScreen을 정의한 파일
 import 'sign_up_page.dart'; // SignUpScreen을 정의한 파일
+import 'package:google_sign_in/google_sign_in.dart';
 
 void main() {
   HttpOverrides.global = MyHttpOverrides();
@@ -19,6 +20,18 @@ class MyHttpOverrides extends HttpOverrides {
   }
 }
 
+const List<String> scopes = <String>[
+  'email',
+  'https://www.googleapis.com/auth/contacts.readonly',
+];
+
+GoogleSignIn _googleSignIn = GoogleSignIn(
+  // Optional clientId
+  // clientId:
+  //     '32011394232-g48tj7ct06e8qgp29ck3nt18ph20ahg9.apps.googleusercontent.com',
+  scopes: scopes,
+);
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -28,6 +41,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: LoginScreen(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -94,6 +108,47 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    try {
+      await _googleSignIn.signIn();
+      if (_googleSignIn.currentUser != null) {
+        // Get the Google token
+        final googleAuth = await _googleSignIn.currentUser!.authentication;
+
+        // Send the token to your backend to verify and create a session
+        final response = await http.post(
+          Uri.parse('https://172.10.7.95/api/google_login'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonEncode(<String, String>{
+            'token': googleAuth.idToken!,
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          final user_info = jsonDecode(response.body);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomeScreen(
+                      user_info: user_info['user'],
+                    )),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Google login failed: ${response.body}')),
+          );
+        }
+      }
+    } catch (error) {
+      print(error);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google sign-in failed: $error')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -143,6 +198,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Text('Sign Up'),
                   ),
                 ],
+              ),
+              SizedBox(height: 20),
+              GestureDetector(
+                onTap: _handleGoogleSignIn,
+                child: Container(
+                  child: Image.asset(
+                    'assets/google_logo.png', // 구글 로고 이미지 경로
+                    height: 40.0,
+                  ),
+                ),
               ),
             ],
           ),
