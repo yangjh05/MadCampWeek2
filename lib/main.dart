@@ -62,13 +62,17 @@ class _LoginScreenState extends State<LoginScreen> {
         }),
       );
 
-      print(response.statusCode);
+      print(response.body);
 
       // 예시: 로그인 성공 시 다른 화면으로 이동
       if (response.statusCode == 200) {
+        final user_info = jsonDecode(response.body);
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
+          MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                    user_info: user_info['user'],
+                  )),
         );
       } else if (response.statusCode == 401) {
         // 로그인 실패 시 처리
