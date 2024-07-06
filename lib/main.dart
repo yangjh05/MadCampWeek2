@@ -231,7 +231,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: TextFormField(
                       controller: _usernameController,
                       decoration: InputDecoration(
-                        hintText: 'Enter your ID',
+                        hintText: 'ID',
                         border: OutlineInputBorder(),
                         contentPadding: EdgeInsets.symmetric(
                             horizontal: 16.0,
@@ -240,7 +240,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (value) {
                         if (value == null || value.isEmpty) {
-                          return 'Please enter your username';
+                          return '아이디를 입력해주세요';
                         }
                         return null;
                       },
@@ -252,7 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         obscureText: _obscureText,
                         controller: _passwordController,
                         decoration: InputDecoration(
-                          hintText: 'Enter your password',
+                          hintText: 'Password',
                           border: OutlineInputBorder(),
                           contentPadding: EdgeInsets.symmetric(
                               horizontal: 16.0,
@@ -269,7 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
-                            return 'Please enter your password';
+                            return '비밀번호를 입력해주세요';
                           }
                           return null;
                         }),
@@ -283,7 +283,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           // 여기에 Forgot Password? 클릭 이벤트 추가
                         },
                         child: Text(
-                          'Forgot Password?',
+                          '비밀번호를 잊으셨나요?',
                           style:
                               TextStyle(color: Colors.blueGrey, fontSize: 15),
                         ),
@@ -305,7 +305,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     child: Text(
                       'Login',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(
+                          fontSize: 16, fontFamily: 'PlusJakartaSans'),
                     ),
                   ),
                   SizedBox(height: MediaQuery.of(context).size.height * 0.025),
@@ -318,7 +319,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         padding: EdgeInsets.symmetric(horizontal: 16.0),
                         child: Text(
                           'Or login with',
-                          style: TextStyle(color: Colors.grey, fontSize: 16),
+                          style: TextStyle(
+                              color: Colors.grey,
+                              fontSize: 16,
+                              fontFamily: 'PlusJakartaSans'),
                         ),
                       ),
                       Expanded(
@@ -342,12 +346,18 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: RichText(
                       text: TextSpan(
                         text: "Don't have an account? ",
-                        style: TextStyle(color: Colors.black, fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                            fontFamily: 'PlusJakartaSans'),
                         children: <TextSpan>[
                           TextSpan(
                             text: 'Register Now',
                             style: TextStyle(
-                                color: Color(0xff495ECA), fontSize: 16),
+                              color: Color(0xff495ECA),
+                              fontSize: 16,
+                              fontFamily: 'PlusJakartaSans',
+                            ),
                           ),
                         ],
                       ),

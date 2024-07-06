@@ -120,6 +120,7 @@ class _HomeScreenState extends State<HomeScreen>
                       "Organizations",
                       style: TextStyle(
                           color: Colors.white,
+                          fontFamily: 'PlusJakartSans',
                           fontSize:
                               30 * (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
                           fontWeight: FontWeight.bold),
@@ -130,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen>
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20 * (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
-                        fontWeight: FontWeight.bold,
+                        fontFamily: 'PlusJakartSans',
                       ),
                     ),
                   ],
@@ -200,7 +201,7 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                             child: Center(
                               child: Text(
-                                '조직 찾기',
+                                '단체 찾기',
                                 style: TextStyle(
                                   color: Colors.white,
                                   fontSize: 16,
@@ -220,7 +221,7 @@ class _HomeScreenState extends State<HomeScreen>
                               children: [
                                 ListTile(
                                   leading: Icon(Icons.search),
-                                  title: Text('찾고 싶은 조직을 검색하세요'),
+                                  title: Text('찾고 싶은 단체를 검색하세요'),
                                 ),
                                 // 추가적인 콘텐츠 추가
                               ],

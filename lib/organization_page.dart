@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:madcamp_week2/add_organization_page.dart';
@@ -22,7 +21,6 @@ class _OrganizationTabState extends State<OrganizationTab> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getOrganizationList();
   }
@@ -62,93 +60,98 @@ class _OrganizationTabState extends State<OrganizationTab> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     if (!isLoadingComplete) {
       return Center(
         child: CircularProgressIndicator(),
       );
     } else {
-      return Center(
-        child: ListView(
-          padding: EdgeInsets.all(20.0),
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0, bottom: 16.0),
-              child: Text(
-                '내 조직',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            if (organization_list.isEmpty)
-              Center(
+      return Stack(
+        children: [
+          ListView(
+            padding: EdgeInsets.all(20.0),
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0, bottom: 16.0),
                 child: Text(
-                  '참여한 조직이 없습니다.',
+                  '내 단체',
                   style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              )
-            else
-              ...organization_list.map((organization) => Container(
-                    margin: EdgeInsets.symmetric(vertical: 8.0),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10.0),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black26,
-                          offset: Offset(0, 2),
-                          blurRadius: 6.0,
-                        ),
-                      ],
+              ),
+              if (organization_list.isEmpty)
+                Center(
+                  child: Text(
+                    '참여한 단체가 없습니다.',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: Colors.grey,
                     ),
-                    child: Padding(
-                      padding: EdgeInsets.all(20.0),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  organization['org_name']!,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  organization['email'] ?? "",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                  ),
-                                ),
-                                SizedBox(height: 4),
-                                Text(
-                                  organization['description'] ?? "",
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Icon(
-                            Icons.chevron_right,
-                            color: Colors.grey,
+                  ),
+                )
+              else
+                ...organization_list.map((organization) => Container(
+                      margin: EdgeInsets.symmetric(vertical: 8.0),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            offset: Offset(0, 2),
+                            blurRadius: 6.0,
                           ),
                         ],
                       ),
-                    ),
-                  )),
-            SizedBox(height: 10),
-            ElevatedButton(
+                      child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    organization['org_name']!,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    organization['email'] ?? "",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontFamily: 'PlusJakartaSans',
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                  SizedBox(height: 4),
+                                  Text(
+                                    organization['description'] ?? "",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right,
+                              color: Colors.grey,
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+            ],
+          ),
+          Positioned(
+            bottom: 80.0,
+            right: 16.0,
+            child: FloatingActionButton(
               onPressed: () {
                 Navigator.push(
                   context,
@@ -158,15 +161,11 @@ class _OrganizationTabState extends State<OrganizationTab> {
                           )),
                 );
               },
-              child: Text("Add an Organization..."),
+              child: Icon(Icons.add, color: Colors.black),
+              backgroundColor: Color(0xfff9e2af),
             ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {},
-              child: Text("Participate in an Organization..."),
-            ),
-          ],
-        ),
+          ),
+        ],
       );
     }
   }
