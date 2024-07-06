@@ -52,20 +52,102 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Align(
                 alignment: Alignment.center,
-                child: Text(
-                  "Welcome, ${user_info['username']}!",
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 8),
+                    Text(
+                      "Organizations",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      "Welcome, ${user_info['username']!}",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
         ),
       ),
-      body: _widgetOptions().elementAt(_selectedIndex),
+      body: Stack(
+        children: [
+          _widgetOptions().elementAt(_selectedIndex),
+          DraggableScrollableSheet(
+            initialChildSize: 0.11,
+            minChildSize: 0.11,
+            maxChildSize: 0.9,
+            builder: (BuildContext context, ScrollController scrollController) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(16.0),
+                    topRight: Radius.circular(16.0),
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black26,
+                      offset: Offset(0, -1),
+                      blurRadius: 10.0,
+                    ),
+                  ],
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(20.0),
+                      decoration: BoxDecoration(
+                        color: Color(0xFF495ECA),
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(16.0),
+                          topRight: Radius.circular(16.0),
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '조직 찾기',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Scrollbar(
+                        thickness: 6.0,
+                        radius: Radius.circular(10),
+                        controller: scrollController,
+                        child: ListView(
+                          controller: scrollController,
+                          padding: EdgeInsets.all(8.0),
+                          children: [
+                            ListTile(
+                              leading: Icon(Icons.search),
+                              title: Text('찾고 싶은 조직을 검색하세요'),
+                            ),
+                            // 추가적인 콘텐츠 추가
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -76,7 +158,9 @@ class _HomeScreenState extends State<HomeScreen> {
             icon: Container(
               padding: EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: _selectedIndex == 1 ? Colors.blue : Colors.transparent,
+                color: _selectedIndex == 1
+                    ? Color(0xFF495ECA)
+                    : Colors.transparent,
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -92,7 +176,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: Color(0xFF495ECA),
+        backgroundColor: Colors.white, // BottomNavigationBar 배경색 변경
         onTap: _onItemTapped,
       ),
     );
