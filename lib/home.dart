@@ -38,8 +38,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Welcome, ${user_info['username']}!"),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(193.0), // AppBar의 높이를 설정
+        child: AppBar(
+          automaticallyImplyLeading: false, // 뒤로가기 버튼 제거
+          flexibleSpace: Stack(
+            children: [
+              Positioned.fill(
+                child: Image(
+                  image: AssetImage('assets/title_background.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Align(
+                alignment: Alignment.center,
+                child: Text(
+                  "Welcome, ${user_info['username']}!",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
       body: _widgetOptions().elementAt(_selectedIndex),
       bottomNavigationBar: BottomNavigationBar(

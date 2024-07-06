@@ -1,4 +1,7 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'home.dart';
 
 class AddOrganizationPage extends StatefulWidget {
   final user_info;
@@ -12,7 +15,9 @@ class AddOrganizationPage extends StatefulWidget {
 class _AddOrganizationState extends State<AddOrganizationPage> {
   final user_info;
   final _organizationNameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _descriptionController = TextEditingController();
+  final _rootRoleController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   _AddOrganizationState({required this.user_info});
 
@@ -34,6 +39,30 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
       ),
       labelStyle: TextStyle(fontSize: 14),
     );
+  }
+
+  void _navigateToAddRolesPage() {
+    if (_formKey.currentState!.validate()) {
+      Role rootRole = Role(
+        _rootRoleController.text,
+        '', // Root role does not have a parent role
+        'Root Role', // You can adjust this description as needed
+      );
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => AddRolesPage(
+            organizationName: _organizationNameController.text,
+            organizationEmail: _emailController.text,
+            organizationDesc: _descriptionController.text,
+            organizationRoot: _rootRoleController.text,
+            user_info: user_info,
+            initialRoles: [rootRole], // Pass the root role as initial role
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -60,23 +89,22 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
             key: _formKey,
             child: ListView(
               children: <Widget>[
-                Text('Add a Organization',
+                Text('조직 추가하기',
                     style: TextStyle(
                         fontSize: 42,
                         color: Color(0xFF495ECA),
                         fontWeight: FontWeight.bold)),
                 SizedBox(height: 8),
-                Text('Create a new Organization',
-                    style: TextStyle(fontSize: 16)),
+                Text('새로운 조직을 만들어보세요', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 24),
                 TextFormField(
                   controller: _organizationNameController,
-                  decoration: _inputDecoration('Organization Name'),
+                  decoration: _inputDecoration('조직 이름'),
                   style: TextStyle(fontSize: 14),
                   validator: (value) {
                     print(value);
                     if (value == null || value.isEmpty) {
-                      return 'Please enter the name of the organization';
+                      return '조직의 이름을 입력해주세요';
                     }
                     return null;
                   },
@@ -85,28 +113,33 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
                   height: 10,
                 ),
                 TextFormField(
+                  controller: _emailController,
+                  decoration: _inputDecoration('이메일'),
+                  style: TextStyle(fontSize: 14),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
                   controller: _descriptionController,
                   maxLines: 7,
-                  decoration: _inputDecoration('Description'),
+                  decoration: _inputDecoration('조직 설명'),
+                  style: TextStyle(fontSize: 14),
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                TextFormField(
+                  controller: _rootRoleController,
+                  decoration: _inputDecoration('내 직급'),
                   style: TextStyle(fontSize: 14),
                 ),
                 SizedBox(
                   height: 10,
                 ),
                 ElevatedButton(
-                  onPressed: () {
-                    if (_formKey.currentState!.validate())
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => AddRolesPage(
-                            organizationName: _organizationNameController.text,
-                            organizationDesc: _descriptionController.text,
-                          ),
-                        ),
-                      );
-                  },
-                  child: Text('Next Step',
+                  onPressed: _navigateToAddRolesPage,
+                  child: Text('다음 단계',
                       style: TextStyle(color: Colors.white, fontSize: 18)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF495ECA),
@@ -134,22 +167,57 @@ class Role {
 }
 
 class AddRolesPage extends StatefulWidget {
-  final organizationName, organizationDesc;
-  AddRolesPage(
-      {required this.organizationName, required this.organizationDesc});
+  final String organizationName;
+  final String organizationEmail;
+  final String organizationDesc;
+  final String organizationRoot;
+  final dynamic user_info;
+  final List<Role> initialRoles;
+
+  AddRolesPage({
+    required this.organizationName,
+    required this.organizationEmail,
+    required this.organizationDesc,
+    required this.organizationRoot,
+    required this.user_info,
+    required this.initialRoles,
+  });
 
   @override
   _AddRolesState createState() => _AddRolesState(
-      organizationDesc: organizationDesc, organizationName: organizationName);
+      organizationDesc: organizationDesc,
+      organizationEmail: organizationEmail,
+      organizationName: organizationName,
+      organizationRoot: organizationRoot,
+      user_info: user_info,
+      initialRoles: initialRoles);
 }
 
 class _AddRolesState extends State<AddRolesPage> {
-  final organizationName, organizationDesc;
+  final String organizationName;
+  final String organizationEmail;
+  final String organizationDesc;
+  final String organizationRoot;
+  final dynamic user_info;
+  final List<Role> initialRoles;
 
   List<Role> Roles = [];
   final _formKey = GlobalKey<FormState>();
-  _AddRolesState(
-      {required this.organizationName, required this.organizationDesc});
+
+  _AddRolesState({
+    required this.organizationName,
+    required this.organizationEmail,
+    required this.organizationDesc,
+    required this.organizationRoot,
+    required this.user_info,
+    required this.initialRoles,
+  });
+
+  @override
+  void initState() {
+    super.initState();
+    Roles = List.from(initialRoles); // Initialize Roles with initial roles
+  }
 
   void _addRoleData() {
     final _dialogFormKey = GlobalKey<FormState>();
@@ -248,20 +316,71 @@ class _AddRolesState extends State<AddRolesPage> {
     );
   }
 
+  Future<void> _submitRoles() async {
+    print(
+        'Submitting roles: $organizationName, $organizationEmail, $organizationDesc, $organizationRoot, $Roles');
+    // 서버로 보내기
+    // organization_name, root_name, description, parent_name, roles, userinfo 다 보내기
+    print(Roles.map((role) => {role.name, role.parent_name, role.description}));
+
+    final response = await http.post(
+      Uri.parse('https://172.10.7.95/api/add_organization'),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode({
+        'org_name': organizationName,
+        'desc': organizationDesc,
+        'email': organizationEmail,
+        'Roles': Roles.map((role) => {
+              'name': role.name,
+              'parent_name': role.parent_name,
+              'description': role.description,
+            }).toList(),
+        'user_info': user_info,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Add organization successful')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => HomeScreen(user_info: user_info)),
+      );
+    } else {
+      print('Failed to add organization: ${response.body}');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add organization: ${response.body}')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          leading: IconButton(
-            icon: Icon(Icons.chevron_left, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context);
+          },
         ),
-        body: SingleChildScrollView(
+        actions: [
+          IconButton(
+            icon: Icon(Icons.check, color: Colors.black),
+            onPressed: _submitRoles,
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.white, // body 부분의 배경색을 흰색으로 설정
           child: Padding(
             padding: EdgeInsets.all(16),
             child: Form(
@@ -318,6 +437,8 @@ class _AddRolesState extends State<AddRolesPage> {
               ),
             ),
           ),
-        ));
+        ),
+      ),
+    );
   }
 }

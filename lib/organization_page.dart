@@ -40,6 +40,7 @@ class _OrganizationTabState extends State<OrganizationTab> {
     if (response.statusCode == 200) {
       setState(() {
         isLoadingComplete = true;
+        print(response.body);
         final org_info = jsonDecode(response.body);
         organization_list = org_info['organizations'];
       });
