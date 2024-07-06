@@ -11,13 +11,54 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState(user_info: user_info);
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 1;
   final user_info;
+  double appbarHeight = 0.21;
+  late AnimationController _controller;
+  late Animation<double> _animation;
   _HomeScreenState({required this.user_info});
 
   final DraggableScrollableController _draggableScrollableController =
       DraggableScrollableController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _controller = AnimationController(
+      duration: Duration(milliseconds: 500), // 애니메이션 지속 시간
+      vsync: this,
+    );
+
+    _animation = Tween<double>(begin: 0.21, end: 0.12).animate(_controller)
+      ..addListener(() {
+        setState(() {
+          appbarHeight = _animation.value; // 애니메이션 값을 변수에 할당
+        });
+      });
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _startAnimation() {
+    if (!_controller.isCompleted) {
+      _controller.forward();
+    }
+  }
+
+  void _reverseAnimation() {
+    if (_controller.isCompleted) {
+      _controller.reverse();
+    }
+  }
 
   List<Widget> _widgetOptions() => <Widget>[
         MyPageTab(
@@ -39,7 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _expandDraggableScrollableSheet() {
     _draggableScrollableController.animateTo(
-      0.9, // 원하는 크기로 설정
+      0.96, // 원하는 크기로 설정
       duration: Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
@@ -47,7 +88,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _collapseDraggableScrollableSheet() {
     _draggableScrollableController.animateTo(
-      0.11, // 초기 크기로 설정
+      0.1, // 초기 크기로 설정
       duration: Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
@@ -57,7 +98,8 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(193.0), // AppBar의 높이를 설정
+        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height *
+            appbarHeight), // AppBar의 높이를 설정
         child: AppBar(
           automaticallyImplyLeading: false, // 뒤로가기 버튼 제거
           flexibleSpace: Stack(
@@ -78,7 +120,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       "Organizations",
                       style: TextStyle(
                           color: Colors.white,
-                          fontSize: 30,
+                          fontSize:
+                              30 * (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
                           fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 8),
@@ -86,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       "Welcome, ${user_info['username']!}",
                       style: TextStyle(
                         color: Colors.white,
-                        fontSize: 20,
+                        fontSize: 20 * (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -97,90 +140,101 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: Stack(
-        children: [
-          _widgetOptions().elementAt(_selectedIndex),
-          DraggableScrollableSheet(
-            controller: _draggableScrollableController,
-            initialChildSize: 0.11,
-            minChildSize: 0.11,
-            maxChildSize: 0.9,
-            builder: (BuildContext context, ScrollController scrollController) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(16.0),
-                    topRight: Radius.circular(16.0),
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black26,
-                      offset: Offset(0, -1),
-                      blurRadius: 10.0,
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      onTap: () {
-                        if (_draggableScrollableController.size == 0.11) {
-                          _expandDraggableScrollableSheet();
-                        } else {
-                          _collapseDraggableScrollableSheet();
-                        }
-                      },
-                      onVerticalDragUpdate: (details) {
-                        scrollController.jumpTo(
-                          scrollController.position.pixels -
-                              details.primaryDelta!,
-                        );
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(20.0),
-                        decoration: BoxDecoration(
-                          color: Color(0xFF495ECA),
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(16.0),
-                            topRight: Radius.circular(16.0),
-                          ),
+      body: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return Stack(
+            children: [
+              _widgetOptions().elementAt(_selectedIndex),
+              DraggableScrollableSheet(
+                controller: _draggableScrollableController,
+                initialChildSize: 0.1,
+                minChildSize: 0.1,
+                maxChildSize: 0.96,
+                builder:
+                    (BuildContext context, ScrollController scrollController) {
+                  return Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(16.0),
+                        topRight: Radius.circular(16.0),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(0, -1),
+                          blurRadius: 10.0,
                         ),
-                        child: Center(
-                          child: Text(
-                            '조직 찾기',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 16,
+                      ],
+                    ),
+                    child: Column(
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (_draggableScrollableController.size == 0.1) {
+                              _startAnimation();
+                              _expandDraggableScrollableSheet();
+                            } else {
+                              _reverseAnimation();
+                              _collapseDraggableScrollableSheet();
+                            }
+                          },
+                          onVerticalDragUpdate: (details) {
+                            if (details.primaryDelta! < 0) {
+                              _startAnimation();
+                              _expandDraggableScrollableSheet();
+                            } else {
+                              _reverseAnimation();
+                              _collapseDraggableScrollableSheet();
+                            }
+                          },
+                          child: Container(
+                            padding: EdgeInsets.all(
+                                (constraints.maxHeight * 0.1 - 25) / 2),
+                            decoration: BoxDecoration(
+                              color: Color(0xFF495ECA),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(16.0),
+                                topRight: Radius.circular(16.0),
+                              ),
+                            ),
+                            child: Center(
+                              child: Text(
+                                '조직 찾기',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                ),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    Expanded(
-                      child: Scrollbar(
-                        thickness: 6.0,
-                        radius: Radius.circular(10),
-                        controller: scrollController,
-                        child: ListView(
-                          controller: scrollController,
-                          padding: EdgeInsets.all(8.0),
-                          children: [
-                            ListTile(
-                              leading: Icon(Icons.search),
-                              title: Text('찾고 싶은 조직을 검색하세요'),
+                        Expanded(
+                          child: Scrollbar(
+                            thickness: 6.0,
+                            radius: Radius.circular(10),
+                            controller: scrollController,
+                            child: ListView(
+                              controller: scrollController,
+                              padding: EdgeInsets.all(8.0),
+                              children: [
+                                ListTile(
+                                  leading: Icon(Icons.search),
+                                  title: Text('찾고 싶은 조직을 검색하세요'),
+                                ),
+                                // 추가적인 콘텐츠 추가
+                              ],
                             ),
-                            // 추가적인 콘텐츠 추가
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     ),
-                  ],
-                ),
-              );
-            },
-          ),
-        ],
+                  );
+                },
+              ),
+            ],
+          );
+        },
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
