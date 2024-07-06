@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:madcamp_week2/add_organization_page.dart';
 
 class OrganizationTab extends StatefulWidget {
   final user_info;
@@ -80,7 +81,15 @@ class _OrganizationTabState extends State<OrganizationTab> {
                 )),
             SizedBox(height: 10),
             ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => AddOrganizationPage(
+                            user_info: user_info,
+                          )),
+                );
+              },
               child: Text("Add an Organization..."),
             ),
             SizedBox(height: 10),
