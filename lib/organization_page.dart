@@ -146,6 +146,7 @@ class _OrganizationTabState extends State<OrganizationTab> {
                         ),
                       ),
                     )),
+              SizedBox(height: 50),
             ],
           ),
           Positioned(
