@@ -13,9 +13,11 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _selectedIndex = 1;
-
   final user_info;
   _HomeScreenState({required this.user_info});
+
+  final DraggableScrollableController _draggableScrollableController =
+      DraggableScrollableController();
 
   List<Widget> _widgetOptions() => <Widget>[
         MyPageTab(
@@ -33,6 +35,22 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+  }
+
+  void _expandDraggableScrollableSheet() {
+    _draggableScrollableController.animateTo(
+      0.9, // 원하는 크기로 설정
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _collapseDraggableScrollableSheet() {
+    _draggableScrollableController.animateTo(
+      0.11, // 초기 크기로 설정
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -83,6 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           _widgetOptions().elementAt(_selectedIndex),
           DraggableScrollableSheet(
+            controller: _draggableScrollableController,
             initialChildSize: 0.11,
             minChildSize: 0.11,
             maxChildSize: 0.9,
@@ -104,21 +123,36 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
                 child: Column(
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(20.0),
-                      decoration: BoxDecoration(
-                        color: Color(0xFF495ECA),
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(16.0),
-                          topRight: Radius.circular(16.0),
+                    GestureDetector(
+                      onTap: () {
+                        if (_draggableScrollableController.size == 0.11) {
+                          _expandDraggableScrollableSheet();
+                        } else {
+                          _collapseDraggableScrollableSheet();
+                        }
+                      },
+                      onVerticalDragUpdate: (details) {
+                        scrollController.jumpTo(
+                          scrollController.position.pixels -
+                              details.primaryDelta!,
+                        );
+                      },
+                      child: Container(
+                        padding: EdgeInsets.all(20.0),
+                        decoration: BoxDecoration(
+                          color: Color(0xFF495ECA),
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(16.0),
+                            topRight: Radius.circular(16.0),
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '조직 찾기',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
+                        child: Center(
+                          child: Text(
+                            '조직 찾기',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                            ),
                           ),
                         ),
                       ),

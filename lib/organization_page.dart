@@ -70,16 +70,83 @@ class _OrganizationTabState extends State<OrganizationTab> {
     } else {
       return Center(
         child: ListView(
-          padding: EdgeInsets.all(8.0),
+          padding: EdgeInsets.all(20.0),
           children: [
-            ...organization_list.map((organization) => Card(
-                  child: Container(
-                    height: 70,
-                    child: Center(
-                      child: Text(organization['org_name']!),
-                    ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0, bottom: 16.0),
+              child: Text(
+                '내 조직',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            if (organization_list.isEmpty)
+              Center(
+                child: Text(
+                  '참여한 조직이 없습니다.',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
                   ),
-                )),
+                ),
+              )
+            else
+              ...organization_list.map((organization) => Container(
+                    margin: EdgeInsets.symmetric(vertical: 8.0),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          offset: Offset(0, 2),
+                          blurRadius: 6.0,
+                        ),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  organization['org_name']!,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  organization['email'] ?? "",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                SizedBox(height: 4),
+                                Text(
+                                  organization['description'] ?? "",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Icon(
+                            Icons.chevron_right,
+                            color: Colors.grey,
+                          ),
+                        ],
+                      ),
+                    ),
+                  )),
             SizedBox(height: 10),
             ElevatedButton(
               onPressed: () {
