@@ -2,17 +2,18 @@
 
 import 'package:flutter/material.dart';
 
-class MyPageTab extends StatefulWidget {
+class OrganizationMyPage extends StatefulWidget {
   final user_info;
-  MyPageTab({required this.user_info});
+  OrganizationMyPage({required this.user_info});
 
   @override
-  _MyPageState createState() => _MyPageState(user_info: user_info);
+  _OrganizationMyPageState createState() =>
+      _OrganizationMyPageState(user_info: user_info);
 }
 
-class _MyPageState extends State<MyPageTab> {
+class _OrganizationMyPageState extends State<OrganizationMyPage> {
   final user_info;
-  _MyPageState({required this.user_info});
+  _OrganizationMyPageState({required this.user_info});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +29,7 @@ class _MyPageState extends State<MyPageTab> {
             Text("User E-mail: ${user_info['email']}"),
             Text("User description: ${user_info['description'] ?? "None"}"),
             ElevatedButton(onPressed: () {}, child: Text("프로필 수정")),
-            ElevatedButton(onPressed: () {}, child: Text("회원 탈퇴")),
+            ElevatedButton(onPressed: () {}, child: Text("조직 탈퇴")),
           ],
         ),
       ),

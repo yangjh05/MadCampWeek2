@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:madcamp_week2/add_organization_page.dart';
+import 'package:madcamp_week2/organization_home.dart';
 
 class OrganizationTab extends StatefulWidget {
   final user_info;
@@ -91,7 +92,21 @@ class _OrganizationTabState extends State<OrganizationTab> {
                   ),
                 )
               else
-                ...organization_list.map((organization) => Container(
+                ...organization_list.asMap().entries.map((entry) {
+                  int index = entry.key;
+                  var organization = entry.value;
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => OrganizationHome(
+                                    user_info: user_info,
+                                    org_info: organization,
+                                    org_num: index,
+                                  )));
+                    },
+                    child: Container(
                       margin: EdgeInsets.symmetric(vertical: 8.0),
                       decoration: BoxDecoration(
                         color: Colors.white,
@@ -145,7 +160,9 @@ class _OrganizationTabState extends State<OrganizationTab> {
                           ],
                         ),
                       ),
-                    )),
+                    ),
+                  );
+                }),
               SizedBox(height: 50),
             ],
           ),
