@@ -154,6 +154,16 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                               fontFamily: 'PlusJakartSans',
                             ),
                           ),
+                          if (org_info['user_state'] == 2)
+                            Text(
+                              "당신은 관리자입니다!!!",
+                              style: TextStyle(
+                                  color: Colors.yellow,
+                                  fontSize: 15 *
+                                      (1 - 0.5 * (0.3 - appbarHeight) / 0.3),
+                                  fontFamily: 'PlusJakartSans',
+                                  fontWeight: FontWeight.bold),
+                            ),
                         ],
                       ),
                     ),

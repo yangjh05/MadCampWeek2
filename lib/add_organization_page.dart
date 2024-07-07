@@ -6,22 +6,35 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 
 class AddOrganizationPage extends StatefulWidget {
-  final user_info;
-  AddOrganizationPage({required this.user_info});
+  final user_info, org_info;
+  AddOrganizationPage({required this.user_info, required this.org_info});
 
   @override
   _AddOrganizationState createState() =>
-      _AddOrganizationState(user_info: user_info);
+      _AddOrganizationState(user_info: user_info, org_info: org_info);
 }
 
 class _AddOrganizationState extends State<AddOrganizationPage> {
-  final user_info;
+  final user_info, org_info;
+  _AddOrganizationState({required this.user_info, required this.org_info});
+
   final _organizationNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _descriptionController = TextEditingController();
   final _rootRoleController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-  _AddOrganizationState({required this.user_info});
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    if (org_info != null) {
+      _organizationNameController.text = org_info['org_name'];
+      _emailController.text = org_info['email'];
+      _descriptionController.text = org_info['description'];
+    }
+  }
 
   InputDecoration _inputDecoration(String labelText) {
     return InputDecoration(
@@ -43,13 +56,48 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
     );
   }
 
-  void _navigateToAddRolesPage() {
+  void _navigateToAddRolesPage() async {
     if (_formKey.currentState!.validate()) {
-      Role rootRole = Role(
-        _rootRoleController.text,
-        '', // Root role does not have a parent role
-        'Root Role', // You can adjust this description as needed
-      );
+      List<Role> Roles = [];
+      if (org_info == null) {
+        Role rootRole = Role(
+            _rootRoleController.text,
+            '', // Root role does not have a parent role
+            'Root Role',
+            -1 // You can adjust this description as needed
+            );
+        Roles = [rootRole];
+      } else {
+        final response = await http.post(
+            Uri.parse('https://172.10.7.95/api/find_all_relationship'),
+            headers: <String, String>{
+              'Content-Type': 'application/json; charset=UTF-8',
+            },
+            body: jsonEncode(<String, String>{
+              'org_id': org_info['organization_id'].toString(),
+            }));
+        if (response.statusCode == 200) {
+          final rel_info = jsonDecode(response.body);
+          //print(rel_info['res'][0]);
+          for (dynamic e in rel_info['res']) {
+            print(e);
+            Role tmp = Role(
+                e['role_name'],
+                e['parent_organization_roles'] == null
+                    ? null
+                    : e['parent_organization_roles'],
+                e['description'],
+                e['organization_role_id']);
+            Roles.add(tmp);
+          }
+          print(Roles);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Failed to get response: ${response.body}')),
+          );
+          throw Exception();
+        }
+      }
 
       Navigator.push(
         context,
@@ -58,9 +106,10 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
             organizationName: _organizationNameController.text,
             organizationEmail: _emailController.text,
             organizationDesc: _descriptionController.text,
-            organizationRoot: _rootRoleController.text,
+            organizationRoot: org_info == null ? _rootRoleController.text : '',
             user_info: user_info,
-            initialRoles: [rootRole], // Pass the root role as initial role
+            org_info: org_info,
+            initialRoles: Roles, // Pass the root role as initial role
           ),
         ),
       );
@@ -91,13 +140,21 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
             key: _formKey,
             child: ListView(
               children: <Widget>[
-                Text('단체 추가하기',
-                    style: TextStyle(
-                        fontSize: 42,
-                        color: Color(0xFF495ECA),
-                        fontWeight: FontWeight.bold)),
+                org_info == null
+                    ? Text('단체 추가하기',
+                        style: TextStyle(
+                            fontSize: 42,
+                            color: Color(0xFF495ECA),
+                            fontWeight: FontWeight.bold))
+                    : Text('단체 수정하기',
+                        style: TextStyle(
+                            fontSize: 42,
+                            color: Color(0xFF495ECA),
+                            fontWeight: FontWeight.bold)),
                 SizedBox(height: 8),
-                Text('새로운 단체을 만들어보세요', style: TextStyle(fontSize: 16)),
+                org_info == null
+                    ? Text('새로운 단체를 만들어보세요', style: TextStyle(fontSize: 16))
+                    : Text('단체 정보를 수정합니다.', style: TextStyle(fontSize: 16)),
                 SizedBox(height: 24),
                 TextFormField(
                   controller: _organizationNameController,
@@ -131,16 +188,17 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
                 SizedBox(
                   height: 10,
                 ),
-                TextFormField(
-                  controller: _rootRoleController,
-                  decoration: _inputDecoration('내 직급'),
-                  style: TextStyle(fontSize: 14),
-                  validator: (value) {
-                    if (value == null || value.isEmpty)
-                      return '역할 이름은 빈칸일 수 없습니다.';
-                    return null;
-                  },
-                ),
+                if (org_info == null)
+                  TextFormField(
+                    controller: _rootRoleController,
+                    decoration: _inputDecoration('내 직급'),
+                    style: TextStyle(fontSize: 14),
+                    validator: (value) {
+                      if (value == null || value.isEmpty)
+                        return '역할 이름은 빈칸일 수 없습니다.';
+                      return null;
+                    },
+                  ),
                 SizedBox(
                   height: 10,
                 ),
@@ -167,10 +225,11 @@ class _AddOrganizationState extends State<AddOrganizationPage> {
 
 class Role {
   String name;
-  String parent_name;
-  String description;
+  String? parent_name;
+  String? description;
+  int role_id;
 
-  Role(this.name, this.parent_name, this.description);
+  Role(this.name, this.parent_name, this.description, this.role_id);
 }
 
 class AddRolesPage extends StatefulWidget {
@@ -178,7 +237,7 @@ class AddRolesPage extends StatefulWidget {
   final String organizationEmail;
   final String organizationDesc;
   final String organizationRoot;
-  final dynamic user_info;
+  final dynamic user_info, org_info;
   final List<Role> initialRoles;
 
   AddRolesPage({
@@ -187,6 +246,7 @@ class AddRolesPage extends StatefulWidget {
     required this.organizationDesc,
     required this.organizationRoot,
     required this.user_info,
+    required this.org_info,
     required this.initialRoles,
   });
 
@@ -197,6 +257,7 @@ class AddRolesPage extends StatefulWidget {
       organizationName: organizationName,
       organizationRoot: organizationRoot,
       user_info: user_info,
+      org_info: org_info,
       initialRoles: initialRoles);
 }
 
@@ -205,7 +266,7 @@ class _AddRolesState extends State<AddRolesPage> {
   final String organizationEmail;
   final String organizationDesc;
   final String organizationRoot;
-  final dynamic user_info;
+  final dynamic user_info, org_info;
   final List<Role> initialRoles;
 
   List<Role> Roles = [];
@@ -217,6 +278,7 @@ class _AddRolesState extends State<AddRolesPage> {
     required this.organizationDesc,
     required this.organizationRoot,
     required this.user_info,
+    required this.org_info,
     required this.initialRoles,
   });
 
@@ -264,36 +326,38 @@ class _AddRolesState extends State<AddRolesPage> {
     return parent;
   }
 
-  bool _hasCycle(int edited, String new_child, String new_parent) {
+  bool _hasCycle(int edited, String new_child, String? new_parent) {
     Map<String, int> nameToNum = {};
     int node_num = 0;
     int i = 0;
     List<int> parent = List.filled(999, 0);
     if (edited == -1 && new_child == "") return true;
     for (var e in Roles) {
+      print(e);
       if (!nameToNum.containsKey(e.name)) nameToNum[e.name] = node_num++;
       if (i != edited) {
-        if (!nameToNum.containsKey(e.parent_name))
-          nameToNum[e.parent_name] = node_num++;
+        if (e.parent_name != null && !nameToNum.containsKey(e.parent_name))
+          nameToNum[e.parent_name!] = node_num++;
       } else {
-        if (!nameToNum.containsKey(new_parent))
+        if (new_parent != null && !nameToNum.containsKey(new_parent))
           nameToNum[new_parent] = node_num++;
       }
       i++;
     }
     if (edited == -1) {
       if (!nameToNum.containsKey(new_child)) nameToNum[new_child] = node_num++;
-      if (!nameToNum.containsKey(new_parent))
+      if (new_parent != null && !nameToNum.containsKey(new_parent))
+        // ignore: curly_braces_in_flow_control_structures
         nameToNum[new_parent] = node_num++;
     }
     for (var j = 0; j < node_num; j++) parent[j] = j;
     i = 0;
     for (var e in Roles) {
-      if (i != edited) {
+      if (e.parent_name != null && i != edited) {
         if (find_parent(parent, nameToNum[e.name]!) ==
             find_parent(parent, nameToNum[e.parent_name]!)) return true;
         union_parent(parent, nameToNum[e.name]!, nameToNum[e.parent_name]!);
-      } else {
+      } else if (new_parent != null && i == edited) {
         if (find_parent(parent, nameToNum[e.name]!) ==
             find_parent(parent, nameToNum[new_parent]!)) return true;
         union_parent(parent, nameToNum[e.name]!, nameToNum[new_parent]!);
@@ -337,7 +401,7 @@ class _AddRolesState extends State<AddRolesPage> {
                       else {
                         Role? role = Roles.firstWhere(
                           (role) => role.name == value,
-                          orElse: () => Role('', '', ''),
+                          orElse: () => Role('', '', '', -1),
                         );
                         if (!(role.name == '' &&
                             role.parent_name == '' &&
@@ -357,7 +421,7 @@ class _AddRolesState extends State<AddRolesPage> {
                       if ((value != null && value.isNotEmpty)) {
                         Role? role = Roles.firstWhere(
                           (role) => role.name == value,
-                          orElse: () => Role('', '', ''),
+                          orElse: () => Role('', '', '', -1),
                         );
                         if ((role.name == '' &&
                             role.parent_name == '' &&
@@ -408,10 +472,10 @@ class _AddRolesState extends State<AddRolesPage> {
                 if (_dialogFormKey.currentState!.validate()) {
                   setState(() {
                     Roles.add(Role(
-                      nameController.text,
-                      parentNameController.text,
-                      descriptionController.text,
-                    ));
+                        nameController.text,
+                        parentNameController.text,
+                        descriptionController.text,
+                        -1));
                   });
                   Navigator.of(context).pop();
                 }
@@ -523,11 +587,15 @@ class _AddRolesState extends State<AddRolesPage> {
               onPressed: () {
                 if (_dialogFormKey.currentState!.validate()) {
                   setState(() {
+                    for (int i = 0; i < Roles.length; i++) {
+                      if (Roles[i].parent_name == Roles[index].name)
+                        Roles[i].parent_name = nameController.text;
+                    }
                     Roles[index] = Role(
-                      nameController.text,
-                      parentNameController.text,
-                      descriptionController.text,
-                    );
+                        nameController.text,
+                        parentNameController.text,
+                        descriptionController.text,
+                        Roles[index].role_id);
                   });
                   Navigator.of(context).pop();
                 }
@@ -545,39 +613,76 @@ class _AddRolesState extends State<AddRolesPage> {
     // 서버로 보내기
     // organization_name, root_name, description, parent_name, roles, userinfo 다 보내기
     print(Roles.map((role) => {role.name, role.parent_name, role.description}));
-
-    final response = await http.post(
-      Uri.parse('https://172.10.7.95/api/add_organization'),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode({
-        'org_name': organizationName,
-        'desc': organizationDesc,
-        'email': organizationEmail,
-        'Roles': Roles.map((role) => {
-              'name': role.name,
-              'parent_name': role.parent_name,
-              'description': role.description,
-            }).toList(),
-        'user_info': user_info,
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Add organization successful')),
+    if (org_info == null) {
+      final response = await http.post(
+        Uri.parse('https://172.10.7.95/api/add_organization'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'org_name': organizationName,
+          'desc': organizationDesc,
+          'email': organizationEmail,
+          'Roles': Roles.map((role) => {
+                'name': role.name,
+                'parent_name': role.parent_name,
+                'description': role.description,
+              }).toList(),
+          'user_info': user_info,
+        }),
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => HomeScreen(user_info: user_info)),
-      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Add organization successful')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomeScreen(user_info: user_info)),
+        );
+      } else {
+        print('Failed to add organization: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Failed to add organization: ${response.body}')),
+        );
+      }
     } else {
-      print('Failed to add organization: ${response.body}');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add organization: ${response.body}')),
+      final response = await http.post(
+        Uri.parse('https://172.10.7.95/api/edit_relationship'),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode({
+          'orga_id': org_info['organization_id'],
+          'org_name': organizationName,
+          'desc': organizationDesc,
+          'email': organizationEmail,
+          'Roles': Roles.map((role) => {
+                'name': role.name,
+                'parent_name': role.parent_name,
+                'description': role.description,
+                'org_role_id': role.role_id
+              }).toList(),
+        }),
       );
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Editing organization successful')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => HomeScreen(user_info: user_info)),
+        );
+      } else {
+        print('Failed to edit organization: ${response.body}');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+              content: Text('Failed to add organization: ${response.body}')),
+        );
+      }
     }
   }
 
@@ -687,8 +792,8 @@ class _AddRolesState extends State<AddRolesPage> {
                                         SizedBox(height: 8),
                                         Text("역할 이름: " + Roles[index].name),
                                         SizedBox(height: 8),
-                                        Text("직속 상위 역할 이름: " +
-                                            Roles[index].parent_name),
+                                        Text(
+                                            "직속 상위 역할 이름: ${Roles[index].parent_name}"),
                                         SizedBox(height: 8),
                                       ],
                                     ),

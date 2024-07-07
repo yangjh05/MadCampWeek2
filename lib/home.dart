@@ -25,6 +25,8 @@ class _HomeScreenState extends State<HomeScreen>
   double appbarHeight = 0.21;
   late AnimationController _controller;
   late Animation<double> _animation;
+  late OverlayEntry _overlayEntry;
+  bool _visible = false;
   _HomeScreenState({required this.user_info});
 
   final DraggableScrollableController _draggableScrollableController =
@@ -79,6 +81,64 @@ class _HomeScreenState extends State<HomeScreen>
       );
       throw Exception();
     }
+  }
+
+  Future<bool> applyParticipation(organization_id) async {
+    final response = await http.post(
+      Uri.parse("https://172.10.7.95/api/apply_participation_org"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'user_id': user_info['user_id'].toString(),
+        'org_id': organization_id.toString(),
+      }),
+    );
+    if (response.statusCode == 500)
+      throw Exception();
+    else
+      return true;
+  }
+
+  void _showMessage() {
+    _overlayEntry = _createOverlayEntry();
+    Overlay.of(context).insert(_overlayEntry);
+    setState(() {
+      _visible = true;
+    });
+
+    Future.delayed(Duration(seconds: 2), () {
+      Future.delayed(Duration(milliseconds: 500), () {
+        _overlayEntry.remove();
+      });
+      setState(() {
+        _visible = false;
+      });
+    });
+  }
+
+  OverlayEntry _createOverlayEntry() {
+    return OverlayEntry(
+      builder: (context) => Positioned(
+        top: 100.0,
+        left: MediaQuery.of(context).size.width / 2 - 100,
+        child: AnimatedOpacity(
+          opacity: _visible ? 1.0 : 0.0,
+          duration: Duration(milliseconds: 500),
+          child: Container(
+            width: 200.0,
+            padding: EdgeInsets.all(10.0),
+            color: Colors.green,
+            child: Center(
+              child: Text(
+                '참가신청 완료되었습니다!',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -266,7 +326,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     organization_list.isEmpty)
                                   Center(
                                     child: Text(
-                                      '참여한 단체가 없습니다.',
+                                      '참여하지 않은 단체가 없습니다!',
                                       style: TextStyle(
                                         fontSize: 16,
                                         color: Colors.grey,
@@ -337,8 +397,12 @@ class _HomeScreenState extends State<HomeScreen>
                                               SizedBox(
                                                 width: 80, // 버튼의 고정된 너비 설정
                                                 child: ElevatedButton(
-                                                  onPressed: () {
-                                                    // 참여하기 눌렀을 때 동작
+                                                  onPressed: () async {
+                                                    bool res =
+                                                        await applyParticipation(
+                                                            organization[
+                                                                'organization_id']);
+                                                    if (res) _showMessage();
                                                   },
                                                   style:
                                                       ElevatedButton.styleFrom(
@@ -359,7 +423,7 @@ class _HomeScreenState extends State<HomeScreen>
                                                               8.0), // 꼭짓점 반지름 조정
                                                     ),
                                                   ),
-                                                  child: Text('참여하기',
+                                                  child: Text('참가 신청',
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontSize: 14)),

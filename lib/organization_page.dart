@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:madcamp_week2/add_organization_page.dart';
-import 'package:madcamp_week2/organization_home.dart';
+import 'package:madcamp_week2/organization_tab.dart';
 
 class OrganizationTab extends StatefulWidget {
   final user_info;
@@ -100,7 +100,7 @@ class _OrganizationTabState extends State<OrganizationTab> {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => OrganizationHome(
+                              builder: (context) => OrganizationNavigator(
                                     user_info: user_info,
                                     org_info: organization,
                                     org_num: index,
@@ -176,6 +176,7 @@ class _OrganizationTabState extends State<OrganizationTab> {
                   MaterialPageRoute(
                       builder: (context) => AddOrganizationPage(
                             user_info: user_info,
+                            org_info: null,
                           )),
                 );
               },
