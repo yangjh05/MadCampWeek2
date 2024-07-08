@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:madcamp_week2/add_notice_page.dart';
 import 'package:madcamp_week2/organization_tab.dart';
+import 'package:gantt_chart/gantt_chart.dart';
 import 'organization_find_people.dart';
 import 'organization_my_page.dart';
 
@@ -137,7 +138,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                           if (organization_list.isNotEmpty)
                             DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
-                                dropdownColor: Colors.black,
+                                dropdownColor: Color(0xFF495ECA),
                                 value: dropDownValue,
                                 items: organization_list
                                     .map<DropdownMenuItem<String>>(
@@ -205,7 +206,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                           SizedBox(height: 8),
                           if (org_info['user_state'] == 2)
                             Text(
-                              "당신은 관리자입니다!!!",
+                              "관리자",
                               style: TextStyle(
                                   color: Colors.yellow,
                                   fontSize: 15 *
@@ -220,16 +221,17 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                 ),
               ),
             ),
+            backgroundColor: Colors.white,
             body: SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(20.0),
                     child: Row(
                       children: [
                         Icon(
-                          Icons.notifications, // bell 아이콘
+                          Icons.notifications_none, // bell 아이콘
                           size: 24.0,
                           color: Colors.black,
                         ),
@@ -266,7 +268,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                             margin: EdgeInsets.only(left: 16.0),
                             padding: EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
-                              color: Colors.white,
+                              color: Color(0xFFF4EDF5),
                               borderRadius: BorderRadius.circular(8.0),
                               boxShadow: [
                                 BoxShadow(
@@ -311,14 +313,84 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                     ),
                   ),
                   Container(
-                    height: 200, // 간트 차트 박스의 높이
-                    color: Colors.blueAccent,
-                    // 여기에는 실제 간트 차트 위젯이 들어가야 합니다.
-                    child: Center(
-                      child: Text(
-                        '간트 차트',
-                        style: TextStyle(color: Colors.white, fontSize: 24),
-                      ),
+                    height: 300, // 간트 차트 박스의 높이
+                    padding: EdgeInsets.all(8.0), // 간트 차트와 테두리 간격
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black12,
+                          offset: Offset(0, 2),
+                          blurRadius: 4.0,
+                        ),
+                      ],
+                    ),
+                    child: GanttChartView(
+                      scrollPhysics: const BouncingScrollPhysics(),
+                      stickyAreaWidth: 200,
+                      showStickyArea: true,
+                      maxDuration: const Duration(days: 30 * 2),
+                      startDate: DateTime(2022, 6, 7),
+                      dayWidth: 30,
+                      eventHeight: 40,
+                      weekEnds: const {WeekDay.friday, WeekDay.saturday},
+                      isExtraHoliday: (context, day) {
+                        return DateUtils.isSameDay(DateTime(2022, 7, 1), day);
+                      },
+                      startOfTheWeek: WeekDay.sunday,
+                      events: [
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 0),
+                          duration: const Duration(days: 0),
+                          displayName: 'Fake Event',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 0),
+                          duration: const Duration(days: 5),
+                          displayName: 'Define scope',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 1),
+                          duration: const Duration(days: 6),
+                          displayName: 'Gather requirements',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 2),
+                          duration: const Duration(days: 7),
+                          displayName: 'Create project plan',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 3),
+                          duration: const Duration(days: 8),
+                          displayName: 'Develop Feature A',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 4),
+                          duration: const Duration(days: 9),
+                          displayName: 'Develop Feature B',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 5),
+                          duration: const Duration(days: 10),
+                          displayName: 'Test Feature A',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 6),
+                          duration: const Duration(days: 11),
+                          displayName: 'Test Feature B',
+                        ),
+                        GanttRelativeEvent(
+                          relativeToStart: const Duration(days: 7),
+                          duration: const Duration(days: 12),
+                          displayName: 'Fix Bugs',
+                        ),
+                        GanttAbsoluteEvent(
+                          displayName: 'Deployment',
+                          startDate: DateTime(2022, 6, 20),
+                          endDate: DateTime(2022, 6, 25),
+                        ),
+                      ],
                     ),
                   ),
                   Padding(

@@ -65,18 +65,28 @@ class _OrganizationFindPeopleState extends State<OrganizationFindUser> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: info_list.length == 0
-            ? Text("다른 구성원이 아직 없습니다!")
-            : ListView.builder(
-                itemCount: info_list.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    title: Text(
-                        "역할 ${info_list[index].role_name} : ${info_list[index].username}"),
-                  );
-                },
-              ),
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Color(0xFF495ECA),
+        automaticallyImplyLeading: false,
+        title: Text('단체 구성원'),
+        titleTextStyle: TextStyle(
+          color: Colors.white,
+          fontSize: 24,
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.chevron_left,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(30.0),
       ),
     );
   }

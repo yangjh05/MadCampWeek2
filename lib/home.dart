@@ -55,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void getOrganizationList() async {
+    print('Getting Organization List');
     final response = await http.post(
       Uri.parse("https://172.10.7.95/api/all_organizations"),
       headers: <String, String>{
@@ -71,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen>
         organization_list = org_info['organizations'] ?? [];
         filtered_organization_list = organization_list; // 초기값 설정
       });
-      print(organization_list);
+      print("Organization List: $organization_list");
     } else if (response.statusCode == 201) {
       setState(() {
         organization_list = [];
@@ -504,8 +505,8 @@ class _HomeScreenState extends State<HomeScreen>
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.settings),
-            label: 'Settings',
+            icon: Icon(Icons.access_alarm),
+            label: 'Alarms',
           ),
         ],
         currentIndex: _selectedIndex,
