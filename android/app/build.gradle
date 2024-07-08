@@ -2,12 +2,17 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'dev.flutter.flutter-gradle-plugin'
-    id 'com.google.gms.google-services' // 이 줄을 추가하세요
+    //id 'com.google.gms.google-services' // 이 줄을 추가하세요
 }
 
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
 dependencies {
-    implementation 'com.google.android.gms:play-services-auth:19.2.0'
-    implementation 'com.google.firebase:firebase-auth:21.0.1' // Firebase 인증에 필요한 의존성 추가
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+    implementation "androidx.credentials:credentials:1.2.2"
+    implementation "androidx.credentials:credentials-play-services-auth:1.2.2"
+    implementation "com.google.android.libraries.identity.googleid:googleid:1.1.1"
     // 다른 의존성들...
 }
 
@@ -31,8 +36,8 @@ if (flutterVersionName == null) {
 
 android {
     namespace = 'com.example.madcamp_week2'
-    compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    compileSdk = 34
+    ndkVersion = '21.3.6528147'
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -41,10 +46,19 @@ android {
 
     defaultConfig {
         applicationId = 'com.example.madcamp_week2'
-        minSdk = flutter.minSdkVersion
-        targetSdk = flutter.targetSdkVersion
-        versionCode = flutterVersionCode.toInteger()
-        versionName = flutterVersionName
+        minSdk = 21
+        targetSdk = 34
+        versionCode = 1
+        versionName = '1.0'
+    }
+
+    signingConfigs {
+        release {
+            keyAlias 'upload'
+            keyPassword 'madcamp2'
+            storeFile file(System.getenv("USERPROFILE") + "/upload-keystore.jks")
+            storePassword 'madcamp2'
+        }
     }
 
     buildTypes {
@@ -59,4 +73,5 @@ flutter {
 }
 
 // 이 줄을 맨 아래로 이동
-apply plugin: 'com.google.gms.google-services'
+
+//apply plugin: 'com.google.gms.google-services'

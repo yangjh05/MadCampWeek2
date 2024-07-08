@@ -26,11 +26,9 @@ const List<String> scopes = <String>[
 ];
 
 GoogleSignIn _googleSignIn = GoogleSignIn(
-  // Optional clientId
-  // clientId:
-  //     '975071060042-06pc5s1lpt88flkoe5no2j1hsnm7nc88.apps.googleusercontent.com',
-  scopes: scopes,
-);
+    scopes: ['email'],
+    clientId:
+        '623722645699-8i469n2trmh870ou21g7524ibupi7r9e.apps.googleusercontent.com');
 
 class MyApp extends StatelessWidget {
   @override
@@ -110,10 +108,12 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleGoogleSignIn() async {
     try {
-      await _googleSignIn.signIn();
-      if (_googleSignIn.currentUser != null) {
+      print("YAY");
+      final GoogleSignInAccount? googleAccount = await _googleSignIn.signIn();
+      print("YAY");
+      if (googleAccount != null) {
         // Get the Google token
-        final googleAuth = await _googleSignIn.currentUser!.authentication;
+        final googleAuth = await googleAccount.authentication;
 
         // Send the token to your backend to verify and create a session
         final response = await http.post(
@@ -152,6 +152,8 @@ class _LoginScreenState extends State<LoginScreen> {
             }),
           );
 
+          print("Auto Sign Up: ${response.body}");
+
           final googleAuth = await _googleSignIn.currentUser!.authentication;
 
           // Send the token to your backend to verify and create a session
@@ -164,7 +166,9 @@ class _LoginScreenState extends State<LoginScreen> {
               'token': googleAuth.idToken!,
             }),
           );
-          final new_user_info = jsonDecode(response.body);
+          print(new_response.statusCode);
+          final new_user_info = jsonDecode(new_response.body);
+          print(new_user_info);
           if (new_response.statusCode == 200) {
             Navigator.push(
               context,

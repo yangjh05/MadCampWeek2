@@ -1,12 +1,9 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="com.example.madcamp_week2">
+<uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="madcamp_week2"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
-
-        <meta-data
-            android:name="com.google.android.gms.auth.api.signin.OAUTH_CLIENT_ID"
-            android:value="975071060042-06pc5s1lpt88flkoe5no2j1hsnm7nc88.apps.googleusercontent.com"/>
 
         <activity
             android:name=".MainActivity"
