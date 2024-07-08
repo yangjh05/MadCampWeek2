@@ -19,14 +19,17 @@ class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   int _selectedIndex = 1;
   final user_info;
-  dynamic organization_list;
+  List<dynamic> organization_list = [];
+  List<dynamic> filtered_organization_list = [];
   bool orgExists = true;
   bool isLoadingComplete = false;
   double appbarHeight = 0.21;
   late AnimationController _controller;
   late Animation<double> _animation;
   late OverlayEntry _overlayEntry;
+  TextEditingController searchController = TextEditingController();
   bool _visible = false;
+
   _HomeScreenState({required this.user_info});
 
   final DraggableScrollableController _draggableScrollableController =
@@ -36,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen>
   void initState() {
     super.initState();
     getOrganizationList();
+    searchController.addListener(_filterList);
 
     _controller = AnimationController(
       duration: Duration(milliseconds: 500), // 애니메이션 지속 시간
@@ -64,13 +68,14 @@ class _HomeScreenState extends State<HomeScreen>
       setState(() {
         isLoadingComplete = true;
         final org_info = jsonDecode(response.body);
-        organization_list =
-            org_info['organizations'] ?? []; // null인 경우 빈 리스트로 설정
+        organization_list = org_info['organizations'] ?? [];
+        filtered_organization_list = organization_list; // 초기값 설정
       });
       print(organization_list);
     } else if (response.statusCode == 201) {
       setState(() {
         organization_list = [];
+        filtered_organization_list = [];
         isLoadingComplete = true;
         orgExists = false;
       });
@@ -141,9 +146,19 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  void _filterList() {
+    String query = searchController.text.toLowerCase();
+    setState(() {
+      filtered_organization_list = organization_list.where((organization) {
+        return organization['org_name'].toLowerCase().contains(query);
+      }).toList();
+    });
+  }
+
   @override
   void dispose() {
     _controller.dispose();
+    searchController.dispose();
     super.dispose();
   }
 
@@ -318,121 +333,141 @@ class _HomeScreenState extends State<HomeScreen>
                               controller: scrollController,
                               padding: EdgeInsets.all(8.0),
                               children: [
-                                ListTile(
-                                  leading: Icon(Icons.search),
-                                  title: Text('찾고 싶은 단체를 검색하세요'),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Container(
+                                    width: 300.0, // 원하는 너비로 설정
+                                    child: TextField(
+                                      controller: searchController,
+                                      decoration: InputDecoration(
+                                        prefixIcon: Icon(Icons.search),
+                                        hintText: '찾고 싶은 단체를 검색하세요',
+                                        hintStyle: TextStyle(fontSize: 16),
+                                        fillColor: Color(0xFFF5F5F5),
+                                        filled: true,
+                                        border: OutlineInputBorder(
+                                          borderSide: BorderSide.none,
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+                                      onChanged: (text) {
+                                        _filterList();
+                                      },
+                                    ),
+                                  ),
                                 ),
-                                if (organization_list == null ||
-                                    organization_list.isEmpty)
-                                  Center(
-                                    child: Text(
-                                      '참여하지 않은 단체가 없습니다!',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
+                                if (filtered_organization_list.isEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Center(
+                                      child: Text(
+                                        '참여할 수 있는 단체가 없습니다!',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: const Color.fromRGBO(
+                                              158, 158, 158, 1),
+                                        ),
                                       ),
                                     ),
                                   )
                                 else
-                                  ...organization_list.map((organization) =>
-                                      Container(
-                                        margin:
-                                            EdgeInsets.symmetric(vertical: 8.0),
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.black26,
-                                              offset: Offset(0, 2),
-                                              blurRadius: 6.0,
+                                  ...filtered_organization_list.map(
+                                    (organization) => Container(
+                                      margin: EdgeInsets.symmetric(
+                                          vertical: 8.0, horizontal: 10.0),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10.0),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black26,
+                                            offset: Offset(0, 2),
+                                            blurRadius: 6.0,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(20.0),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Flexible(
+                                              flex: 3,
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    organization['org_name']!,
+                                                    style: TextStyle(
+                                                      fontSize: 18,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    organization['email'] ?? "",
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.grey[600],
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    organization[
+                                                            'description'] ??
+                                                        "",
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            SizedBox(
+                                              width: 8, // 두 요소 사이의 간격 조정
+                                            ),
+                                            SizedBox(
+                                              width: 80, // 버튼의 고정된 너비 설정
+                                              child: ElevatedButton(
+                                                onPressed: () async {
+                                                  bool res =
+                                                      await applyParticipation(
+                                                          organization[
+                                                              'organization_id']);
+                                                  if (res) _showMessage();
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  foregroundColor: Colors.white,
+                                                  backgroundColor:
+                                                      Color(0xff495ECA),
+                                                  padding: EdgeInsets.symmetric(
+                                                      vertical:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .height *
+                                                              0.022),
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8.0), // 꼭짓점 반지름 조정
+                                                  ),
+                                                ),
+                                                child: Text('참가 신청',
+                                                    style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 14)),
+                                              ),
                                             ),
                                           ],
                                         ),
-                                        child: Padding(
-                                          padding: EdgeInsets.all(20.0),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Flexible(
-                                                flex: 3,
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      organization['org_name']!,
-                                                      style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      organization['email'] ??
-                                                          "",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.grey[600],
-                                                      ),
-                                                    ),
-                                                    SizedBox(height: 4),
-                                                    Text(
-                                                      organization[
-                                                              'description'] ??
-                                                          "",
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                              SizedBox(
-                                                width: 8, // 두 요소 사이의 간격 조정
-                                              ),
-                                              SizedBox(
-                                                width: 80, // 버튼의 고정된 너비 설정
-                                                child: ElevatedButton(
-                                                  onPressed: () async {
-                                                    bool res =
-                                                        await applyParticipation(
-                                                            organization[
-                                                                'organization_id']);
-                                                    if (res) _showMessage();
-                                                  },
-                                                  style:
-                                                      ElevatedButton.styleFrom(
-                                                    foregroundColor:
-                                                        Colors.white,
-                                                    backgroundColor:
-                                                        Color(0xff495ECA),
-                                                    padding: EdgeInsets.symmetric(
-                                                        vertical: MediaQuery.of(
-                                                                    context)
-                                                                .size
-                                                                .height *
-                                                            0.022),
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              8.0), // 꼭짓점 반지름 조정
-                                                    ),
-                                                  ),
-                                                  child: Text('참가 신청',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 14)),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      )),
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
