@@ -42,6 +42,8 @@ class _OrganizationMyPageState extends State<OrganizationMyPage> {
               icon: Icons.settings,
               childMarginBottom: 20,
               childMarginTop: 20,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0)),
               children: [
                 SpeedDialChild(
                   child: Padding(

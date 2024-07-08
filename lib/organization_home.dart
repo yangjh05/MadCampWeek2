@@ -1,9 +1,10 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:madcamp_week2/add_notice_page.dart';
 import 'package:madcamp_week2/organization_tab.dart';
 import 'organization_find_people.dart';
-import 'organization_my_page.dart'; // Import OrganizationNavigator
+import 'organization_my_page.dart';
 
 class OrganizationHome extends StatefulWidget {
   final user_info, org_info, org_num;
@@ -22,7 +23,6 @@ class _OrganizationHomeState extends State<OrganizationHome> {
   double appbarHeight = 0.30;
   bool isLoadingComplete = false;
   String? dropDownValue;
-  int _selectedIndex = 1;
 
   dynamic organization_list = [];
   dynamic role_info = [];
@@ -95,7 +95,6 @@ class _OrganizationHomeState extends State<OrganizationHome> {
       context,
       MaterialPageRoute(
         builder: (context) => OrganizationNavigator(
-          // Use OrganizationNavigator instead
           user_info: user_info,
           org_info: organization_list[orgIndex],
           org_num: orgIndex,
@@ -250,20 +249,55 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                     child: ListView(
                       scrollDirection: Axis.horizontal,
                       children: [
-                        NoticeCard(
-                          title: '긴급공지입니다',
-                          content:
-                              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Odio amet feugiat ut ...',
-                        ),
-                        NoticeCard(
-                          title: '서버 중단 안내',
-                          content:
-                              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Odio amet feugiat ut ...',
-                        ),
-                        NoticeCard(
-                          title: '업데이트 안내',
-                          content:
-                              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Odio amet feugiat ut ...',
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => AddNoticePage(
+                                  user_info: user_info,
+                                  org_info: org_info,
+                                ),
+                              ),
+                            );
+                          },
+                          child: Container(
+                            width: 200,
+                            margin: EdgeInsets.only(left: 16.0),
+                            padding: EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(8.0),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black12,
+                                  offset: Offset(0, 2),
+                                  blurRadius: 4.0,
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.add,
+                                    size: 40.0,
+                                    color: Colors.grey,
+                                  ),
+                                  SizedBox(width: 8.0),
+                                  Text(
+                                    '공지 추가',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     ),
