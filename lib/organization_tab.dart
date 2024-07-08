@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:madcamp_week2/organization_find_people.dart';
-import 'package:madcamp_week2/organization_home.dart';
-import 'package:madcamp_week2/organization_my_page.dart';
+import 'organization_find_people.dart';
+import 'organization_home.dart';
+import 'organization_my_page.dart';
 
 class OrganizationNavigator extends StatefulWidget {
   final user_info, org_info, org_num;
@@ -9,17 +9,17 @@ class OrganizationNavigator extends StatefulWidget {
       {required this.user_info, required this.org_info, required this.org_num});
 
   @override
-  _OrganizationTabState createState() => _OrganizationTabState(
+  _OrganizationNavigatorState createState() => _OrganizationNavigatorState(
         user_info: user_info,
         org_info: org_info,
         org_num: org_num,
       );
 }
 
-class _OrganizationTabState extends State<OrganizationNavigator> {
+class _OrganizationNavigatorState extends State<OrganizationNavigator> {
   int _selectedIndex = 1;
   final user_info, org_info, org_num;
-  _OrganizationTabState(
+  _OrganizationNavigatorState(
       {required this.user_info, required this.org_info, required this.org_num});
 
   List<Widget> _widgetOptions() => <Widget>[
@@ -47,7 +47,6 @@ class _OrganizationTabState extends State<OrganizationNavigator> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return Scaffold(
       body: LayoutBuilder(
         builder: (context, constraints) =>

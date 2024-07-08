@@ -38,7 +38,7 @@ class _OrganizationMyPageState extends State<OrganizationMyPage> {
       floatingActionButton: org_info['user_state'] == 2
           ? SpeedDial(
               animatedIcon: AnimatedIcons.menu_close,
-              backgroundColor: Colors.blue,
+              backgroundColor: Color(0xfff9e2af),
               icon: Icons.settings,
               childMarginBottom: 20,
               childMarginTop: 20,

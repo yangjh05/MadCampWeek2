@@ -65,6 +65,7 @@ flutter:
     - assets/logo.png
     - assets/title_background.png
     - assets/profile.jpg
+    - assets/profile_icon.png
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
 
