@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
@@ -29,7 +28,6 @@ class _OrganizationFindPeopleState extends State<OrganizationFindUser> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getDatabase();
   }
@@ -85,9 +83,48 @@ class _OrganizationFindPeopleState extends State<OrganizationFindUser> {
           },
         ),
       ),
-      body: Padding(
-        padding: EdgeInsets.all(30.0),
-      ),
+      body: isLoadingComplete
+          ? Padding(
+              padding: EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '전체 ${info_list.length + 1}명', // 전체 구성원 수
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: info_list.length,
+                      itemBuilder: (context, index) {
+                        var member = info_list[index];
+                        return Column(
+                          children: [
+                            ListTile(
+                              leading: CircleAvatar(
+                                radius: 30,
+                                backgroundImage: AssetImage(
+                                    'assets/profile_icon.png'), // 기본 이미지 경로 설정
+                              ),
+                              title: Text(member['username']),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(member['role_name']),
+                                  Text(member['email']),
+                                ],
+                              ),
+                            ),
+                            Divider(),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            )
+          : Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -134,7 +134,7 @@ class _OrganizationEditProfilePageState
                   return null;
                 },
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 8.0),
               Text('이메일', style: TextStyle(fontSize: 16, color: Colors.black)),
               TextFormField(
                 controller: _emailController,
@@ -144,6 +144,7 @@ class _OrganizationEditProfilePageState
                   fillColor: Color(0xFFF5F5F5),
                 ),
               ),
+              SizedBox(height: 8.0),
               Text('휴대전화', style: TextStyle(fontSize: 16, color: Colors.black)),
               TextFormField(
                 controller: _phoneController,
@@ -153,7 +154,7 @@ class _OrganizationEditProfilePageState
                   fillColor: Color(0xFFF5F5F5),
                 ),
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 8.0),
               Text('자기소개', style: TextStyle(fontSize: 16, color: Colors.black)),
               TextFormField(
                 controller: _descriptionController,
@@ -164,7 +165,7 @@ class _OrganizationEditProfilePageState
                 ),
                 maxLines: 3,
               ),
-              SizedBox(height: 32.0),
+              SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _saveProfile,
                 child: Text('수정하기', style: TextStyle(color: Colors.white)),

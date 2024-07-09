@@ -30,15 +30,6 @@ class _OrganizationMyPageState extends State<MyPageTab> {
           fontSize: 24,
         ),
         centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.chevron_left,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(30.0),
