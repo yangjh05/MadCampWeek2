@@ -52,7 +52,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
               ),
               SizedBox(height: 8.0),
               Text(
-                user_info['username'],
+                user_info['username']!,
                 style: TextStyle(
                   fontSize: 18,
                   fontFamily: 'PlusJakartSans',
@@ -61,7 +61,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
               ),
               SizedBox(height: 4.0),
               Text(
-                user_info['email'],
+                user_info['email'] ?? "No e-mail Yet",
                 style: TextStyle(
                   color: Colors.black,
                   fontFamily: 'PlusJakartSans',
@@ -70,7 +70,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
               ),
               SizedBox(height: 4.0),
               Text(
-                "Tel: ${user_info['phone_number']}",
+                "Tel: ${user_info['phone_number'] ?? "No phone-number yet"}",
                 style: TextStyle(
                   color: Colors.black,
                   fontFamily: 'PlusJakartSans',
@@ -89,7 +89,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
                 child: SingleChildScrollView(
                   // 내용이 넘칠 경우 스크롤 가능하게 설정
                   child: Text(
-                    user_info['description'],
+                    user_info['description'] ?? "No description Yet.",
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.black,

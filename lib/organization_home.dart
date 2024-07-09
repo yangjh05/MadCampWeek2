@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
+import 'package:madcamp_week2/accept_application.dart';
 import 'package:madcamp_week2/add_notice_page.dart';
 import 'package:madcamp_week2/add_organization_page.dart';
 import 'package:madcamp_week2/organization_tab.dart';
@@ -418,7 +419,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                     animatedIcon: AnimatedIcons.menu_close,
                     backgroundColor: Color(0xfff9e2af),
                     icon: Icons.settings,
-                    spaceBetweenChildren: 20.0,
+                    spaceBetweenChildren: 15.0,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16.0)),
                     children: [
@@ -431,8 +432,17 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                             child: Icon(Icons.manage_accounts, size: 20.0),
                           ),
                         ),
-                        label: '회원 관리',
-                        onTap: () => print('Add Tapped'),
+                        label: '가입 신청 회원 관리',
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => AcceptApplication(
+                                        user_info: user_info,
+                                        org_info: org_info,
+                                        org_num: org_num,
+                                      )));
+                        },
                       ),
                       SpeedDialChild(
                           child: Padding(
