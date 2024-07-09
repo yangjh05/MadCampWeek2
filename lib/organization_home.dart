@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
 import 'package:madcamp_week2/add_notice_page.dart';
+import 'package:madcamp_week2/add_organization_page.dart';
 import 'package:madcamp_week2/organization_tab.dart';
 import 'package:gantt_chart/gantt_chart.dart';
 import 'organization_find_people.dart';
@@ -107,7 +109,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
   @override
   Widget build(BuildContext context) {
     return !role_info.isNotEmpty
-        ? CircularProgressIndicator()
+        ? Center(child: CircularProgressIndicator())
         : Scaffold(
             appBar: PreferredSize(
               preferredSize: Size.fromHeight(
@@ -411,6 +413,60 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                 ],
               ),
             ),
+            floatingActionButton: org_info['user_state'] == 2
+                ? SpeedDial(
+                    animatedIcon: AnimatedIcons.menu_close,
+                    backgroundColor: Color(0xfff9e2af),
+                    icon: Icons.settings,
+                    spaceBetweenChildren: 20.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0)),
+                    children: [
+                      SpeedDialChild(
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            width: 50.0,
+                            height: 50.0,
+                            child: Icon(Icons.manage_accounts, size: 20.0),
+                          ),
+                        ),
+                        label: '회원 관리',
+                        onTap: () => print('Add Tapped'),
+                      ),
+                      SpeedDialChild(
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Container(
+                              width: 50.0,
+                              height: 50.0,
+                              child: Icon(Icons.edit, size: 20.0),
+                            ),
+                          ),
+                          label: '단체 정보 수정',
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AddOrganizationPage(
+                                        user_info: user_info,
+                                        org_info: org_info)));
+                          }),
+                      SpeedDialChild(
+                        child: Icon(
+                          Icons.delete_outline,
+                          size: 20.0,
+                          color: Colors.white, // 아이콘 색상
+                        ),
+                        backgroundColor:
+                            Color.fromARGB(255, 243, 61, 33), // 버튼 배경색
+                        foregroundColor: Colors.white, // 텍스트 색상
+                        label: '단체 탈퇴하기',
+                        onTap: () {},
+                      )
+                    ],
+                  )
+                : null,
           );
   }
 }

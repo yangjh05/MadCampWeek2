@@ -203,7 +203,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _collapseDraggableScrollableSheet() {
     _draggableScrollableController.animateTo(
-      0.1, // 초기 크기로 설정
+      _selectedIndex == 1 ? 0.1 : 0.074, // 초기 크기로 설정
       duration: Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
@@ -212,50 +212,54 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height *
-            appbarHeight), // AppBar의 높이를 설정
-        child: AppBar(
-          automaticallyImplyLeading: false, // 뒤로가기 버튼 제거
-          flexibleSpace: Stack(
-            children: [
-              Positioned.fill(
-                child: Image(
-                  image: AssetImage('assets/title_background.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Align(
-                alignment: Alignment.center,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
+      appBar: _selectedIndex == 1
+          ? PreferredSize(
+              preferredSize: Size.fromHeight(
+                  MediaQuery.of(context).size.height *
+                      appbarHeight), // AppBar의 높이를 설정
+              child: AppBar(
+                automaticallyImplyLeading: false, // 뒤로가기 버튼 제거
+                flexibleSpace: Stack(
                   children: [
-                    SizedBox(height: 8),
-                    Text(
-                      "Organizations",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'PlusJakartSans',
-                          fontSize:
-                              30 * (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
-                          fontWeight: FontWeight.bold),
+                    Positioned.fill(
+                      child: Image(
+                        image: AssetImage('assets/title_background.png'),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    SizedBox(height: 8),
-                    Text(
-                      "Welcome, ${user_info['username']!}",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20 * (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
-                        fontFamily: 'PlusJakartSans',
+                    Align(
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 8),
+                          Text(
+                            "Organizations",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontFamily: 'PlusJakartSans',
+                                fontSize: 30 *
+                                    (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
+                                fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(height: 8),
+                          Text(
+                            "Welcome, ${user_info['username']!}",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize:
+                                  20 * (1 - 0.5 * (0.21 - appbarHeight) / 0.21),
+                              fontFamily: 'PlusJakartSans',
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            )
+          : null,
       body: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           return Stack(
@@ -263,8 +267,8 @@ class _HomeScreenState extends State<HomeScreen>
               _widgetOptions().elementAt(_selectedIndex),
               DraggableScrollableSheet(
                 controller: _draggableScrollableController,
-                initialChildSize: 0.1,
-                minChildSize: 0.1,
+                initialChildSize: _selectedIndex == 1 ? 0.1 : 0.074,
+                minChildSize: _selectedIndex == 1 ? 0.1 : 0.074,
                 maxChildSize: 0.96,
                 builder:
                     (BuildContext context, ScrollController scrollController) {
@@ -287,10 +291,12 @@ class _HomeScreenState extends State<HomeScreen>
                       children: [
                         GestureDetector(
                           onTap: () {
-                            if (_draggableScrollableController.size == 0.1) {
+                            if (_draggableScrollableController.size ==
+                                (_selectedIndex == 1 ? 0.1 : 0.074)) {
                               _startAnimation();
                               _expandDraggableScrollableSheet();
                             } else {
+                              FocusScope.of(context).unfocus();
                               _reverseAnimation();
                               _collapseDraggableScrollableSheet();
                             }
@@ -300,13 +306,13 @@ class _HomeScreenState extends State<HomeScreen>
                               _startAnimation();
                               _expandDraggableScrollableSheet();
                             } else {
+                              FocusScope.of(context).unfocus();
                               _reverseAnimation();
                               _collapseDraggableScrollableSheet();
                             }
                           },
                           child: Container(
-                            padding: EdgeInsets.all(
-                                (constraints.maxHeight * 0.1 - 25) / 2),
+                            padding: EdgeInsets.all(15),
                             decoration: BoxDecoration(
                               color: Color(0xFF495ECA),
                               borderRadius: BorderRadius.only(

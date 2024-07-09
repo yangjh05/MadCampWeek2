@@ -1,36 +1,41 @@
 // organization_edit_profile.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:madcamp_week2/home.dart';
+import 'package:madcamp_week2/organization_page.dart';
 
 class OrganizationEditProfilePage extends StatefulWidget {
-  final user_info, org_info;
+  final user_info;
 
-  OrganizationEditProfilePage(
-      {required this.user_info, required this.org_info});
+  OrganizationEditProfilePage({required this.user_info});
 
   @override
   _OrganizationEditProfilePageState createState() =>
-      _OrganizationEditProfilePageState(
-          user_info: user_info, org_info: org_info);
+      _OrganizationEditProfilePageState(user_info: user_info);
 }
 
 class _OrganizationEditProfilePageState
     extends State<OrganizationEditProfilePage> {
-  final user_info, org_info;
+  final user_info;
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _usernameController;
   late TextEditingController _emailController;
   late TextEditingController _descriptionController;
+  late TextEditingController _phoneController;
 
-  _OrganizationEditProfilePageState(
-      {required this.user_info, required this.org_info});
+  _OrganizationEditProfilePageState({required this.user_info});
 
   @override
   void initState() {
     super.initState();
+    print(user_info);
     _usernameController = TextEditingController(text: user_info['username']);
     _emailController = TextEditingController(text: user_info['email']);
     _descriptionController =
         TextEditingController(text: user_info['description']);
+    _phoneController = TextEditingController(text: user_info['phone_number']);
   }
 
   @override
@@ -41,11 +46,31 @@ class _OrganizationEditProfilePageState
     super.dispose();
   }
 
-  void _saveProfile() {
+  void _saveProfile() async {
     if (_formKey.currentState!.validate()) {
-      // Perform save operation, e.g., send updated data to server
-      print('Profile saved');
-      Navigator.of(context).pop();
+      final response =
+          await http.post(Uri.parse("https://172.10.7.95/api/update_desc"),
+              headers: <String, String>{
+                'Content-Type': 'application/json; charset=UTF-8',
+              },
+              body: jsonEncode(<String, String>{
+                'user_id': user_info['user_id'].toString(),
+                'name': _usernameController.text,
+                'desc': _descriptionController.text,
+                'email': _emailController.text,
+                'phone': _phoneController.text,
+              }));
+      if (response.statusCode == 201)
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(
+                user_info: jsonDecode(response.body)['user'],
+                //org_info: org_info,
+              ),
+            ),
+            (Route<dynamic> route) => route.isFirst);
+      else
+        throw Exception();
     }
   }
 
@@ -118,12 +143,15 @@ class _OrganizationEditProfilePageState
                   filled: true,
                   fillColor: Color(0xFFF5F5F5),
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '이메일을 입력해주세요';
-                  }
-                  return null;
-                },
+              ),
+              Text('휴대전화', style: TextStyle(fontSize: 16, color: Colors.black)),
+              TextFormField(
+                controller: _phoneController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  filled: true,
+                  fillColor: Color(0xFFF5F5F5),
+                ),
               ),
               SizedBox(height: 16.0),
               Text('자기소개', style: TextStyle(fontSize: 16, color: Colors.black)),
@@ -135,12 +163,6 @@ class _OrganizationEditProfilePageState
                   fillColor: Color(0xFFF5F5F5),
                 ),
                 maxLines: 3,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return '자기소개를 입력해주세요';
-                  }
-                  return null;
-                },
               ),
               SizedBox(height: 32.0),
               ElevatedButton(
