@@ -2,11 +2,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:http/http.dart' as http;
+import 'package:gantt_view/gantt_view.dart';
 import 'package:madcamp_week2/accept_application.dart';
 import 'package:madcamp_week2/add_notice_page.dart';
 import 'package:madcamp_week2/add_organization_page.dart';
 import 'package:madcamp_week2/organization_tab.dart';
-import 'package:gantt_chart/gantt_chart.dart';
 import 'organization_find_people.dart';
 import 'organization_my_page.dart';
 
@@ -110,6 +110,9 @@ class _OrganizationHomeState extends State<OrganizationHome> {
 
   @override
   Widget build(BuildContext context) {
+    final List<ExampleEventItem> _items =
+        Data.dummyData; // Replace with actual data
+
     return !role_info.isNotEmpty
         ? Center(child: CircularProgressIndicator())
         : Scaffold(
@@ -152,7 +155,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                                     child: Text(
                                       value['org_name'],
                                       style: TextStyle(
-                                          color: Colors.white, fontSize: 24),
+                                          color: Colors.white, fontSize: 20),
                                     ),
                                   );
                                 }).toList(),
@@ -240,7 +243,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                           size: 24.0,
                           color: Colors.black,
                         ),
-                        SizedBox(width: 8.0), // 텍스트와 아이콘 사이의 간격
+                        SizedBox(width: 4.0), // 텍스트와 아이콘 사이의 간격
                         Text(
                           '공지사항',
                           style: TextStyle(
@@ -310,11 +313,21 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(16.0),
-                    child: Text(
-                      '현재 업무 상황',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    padding: EdgeInsets.all(20.0),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.task_outlined, // bell 아이콘
+                          size: 24.0,
+                          color: Colors.black,
+                        ),
+                        SizedBox(width: 4.0), // 텍스트와 아이콘 사이의 간격
+                        Text(
+                          '현재 업무 상황',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                      ],
                     ),
                   ),
                   Container(
@@ -331,71 +344,59 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                         ),
                       ],
                     ),
-                    child: GanttChartView(
-                      scrollPhysics: const BouncingScrollPhysics(),
-                      stickyAreaWidth: 200,
-                      showStickyArea: true,
-                      maxDuration: const Duration(days: 30 * 2),
-                      startDate: DateTime(2022, 6, 7),
-                      dayWidth: 30,
-                      eventHeight: 40,
-                      weekEnds: const {WeekDay.friday, WeekDay.saturday},
-                      isExtraHoliday: (context, day) {
-                        return DateUtils.isSameDay(DateTime(2022, 7, 1), day);
-                      },
-                      startOfTheWeek: WeekDay.sunday,
-                      events: [
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 0),
-                          duration: const Duration(days: 0),
-                          displayName: 'Fake Event',
+                    child: GanttChart<ExampleEventItem>(
+                      rows: _items.toRows(),
+                      style: GanttStyle(
+                        columnWidth: 100,
+                        barHeight: 30,
+                        timelineAxisType: TimelineAxisType.daily,
+                        tooltipType: TooltipType.hover,
+                        taskBarColor: Color(0xFFE4CCFF),
+                        activityLabelColor: Colors.blue.shade500,
+                        taskLabelColor: Color(0xFFD1EBFF),
+                        taskLabelBuilder: (task) => Container(
+                          padding: const EdgeInsets.all(4),
+                          child: Text(
+                            task.data.title,
+                            style: const TextStyle(
+                              fontFamily: 'PlusJakartSans',
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                            ),
+                          ),
                         ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 0),
-                          duration: const Duration(days: 5),
-                          displayName: 'Define scope',
-                        ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 1),
-                          duration: const Duration(days: 6),
-                          displayName: 'Gather requirements',
-                        ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 2),
-                          duration: const Duration(days: 7),
-                          displayName: 'Create project plan',
-                        ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 3),
-                          duration: const Duration(days: 8),
-                          displayName: 'Develop Feature A',
-                        ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 4),
-                          duration: const Duration(days: 9),
-                          displayName: 'Develop Feature B',
-                        ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 5),
-                          duration: const Duration(days: 10),
-                          displayName: 'Test Feature A',
-                        ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 6),
-                          duration: const Duration(days: 11),
-                          displayName: 'Test Feature B',
-                        ),
-                        GanttRelativeEvent(
-                          relativeToStart: const Duration(days: 7),
-                          duration: const Duration(days: 12),
-                          displayName: 'Fix Bugs',
-                        ),
-                        GanttAbsoluteEvent(
-                          displayName: 'Deployment',
-                          startDate: DateTime(2022, 6, 20),
-                          endDate: DateTime(2022, 6, 25),
-                        ),
-                      ],
+                        gridColor: Colors.white,
+                        taskBarRadius: 10,
+                        activityLabelBuilder: (activity) {
+                          return Container(
+                            padding: const EdgeInsets.all(4),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  activity.label!,
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const Text(
+                                  'A subtitle',
+                                  style: TextStyle(
+                                    fontStyle: FontStyle.italic,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        axisDividerColor: Colors.white,
+                        tooltipColor: Color(0xFF495ECA),
+                        tooltipPadding: const EdgeInsets.symmetric(
+                            horizontal: 8.0, vertical: 4.0),
+                        weekendColor: Color(0xFFF4EDF5),
+                      ),
                     ),
                   ),
                 ],
@@ -511,5 +512,74 @@ class NoticeCard extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+
+// 데이터 모델 예제입니다. 실제 데이터에 맞게 수정해주세요.
+class ExampleEventItem {
+  final String title;
+  final DateTime start;
+  final DateTime end;
+  final String group;
+
+  ExampleEventItem({
+    required this.title,
+    required this.start,
+    required this.end,
+    required this.group,
+  });
+}
+
+class Data {
+  static List<ExampleEventItem> dummyData = [
+    ExampleEventItem(
+      title: 'Task 1',
+      start: DateTime(2022, 6, 7),
+      end: DateTime(2022, 6, 10),
+      group: 'Group 1',
+    ),
+    ExampleEventItem(
+      title: 'Task 2',
+      start: DateTime(2022, 6, 11),
+      end: DateTime(2022, 6, 13),
+      group: 'Group 1',
+    ),
+    ExampleEventItem(
+      title: 'Task 3',
+      start: DateTime(2022, 6, 14),
+      end: DateTime(2022, 6, 18),
+      group: 'Group 2',
+    ),
+  ];
+}
+
+extension on DateTime {
+  String get formattedDate => '$year/$month/$day';
+}
+
+extension on List<ExampleEventItem> {
+  List<GridRow> toRows() {
+    List<GridRow> rows = [];
+    Map<String, List<TaskGridRow<ExampleEventItem>>> labelTasks = {};
+
+    sort((a, b) => a.start.compareTo(b.start));
+
+    for (var item in this) {
+      final label = item.group;
+      (labelTasks[label] ??= []).add(TaskGridRow<ExampleEventItem>(
+        data: item,
+        startDate: item.start,
+        endDate: item.end,
+        tooltip:
+            '${item.title}\n${item.start.formattedDate} - ${item.end.formattedDate}',
+      ));
+    }
+
+    for (var label in labelTasks.keys) {
+      rows.add(ActivityGridRow(label));
+      rows.addAll(labelTasks[label]!);
+    }
+
+    return rows;
   }
 }

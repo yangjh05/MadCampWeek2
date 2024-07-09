@@ -70,7 +70,7 @@ class _OrganizationFindPeopleState extends State<OrganizationFindUser> {
         title: Text('단체 구성원'),
         titleTextStyle: TextStyle(
           color: Colors.white,
-          fontSize: 24,
+          fontSize: 20,
         ),
         centerTitle: true,
         leading: IconButton(

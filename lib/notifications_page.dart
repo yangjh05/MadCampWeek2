@@ -37,9 +37,10 @@ class _NotificationsTabState extends State<NotificationsTab> {
 
     if (response.statusCode == 200) {
       setState(() {
-        notifications = jsonDecode(response.body)['notifications'];
+        notifications = jsonDecode(response.body)['notifications'] ?? [];
         isLoading = false;
       });
+      print(notifications);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to load notifications')),
@@ -60,25 +61,49 @@ class _NotificationsTabState extends State<NotificationsTab> {
         title: Text('알림'),
         titleTextStyle: TextStyle(
           color: Colors.white,
-          fontSize: 24,
+          fontSize: 20,
         ),
         centerTitle: true,
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: EdgeInsets.all(16.0),
-              child: ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  return ListTile(
-                    leading: Icon(Icons.notifications),
-                    title: Text(notifications[index]['title']),
-                    subtitle: Text(notifications[index]['subtitle']),
-                  );
-                },
-              ),
-            ),
+          : notifications.isEmpty
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        '알림이 없습니다.',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        '새로운 알림이 도착하면 여기에서 확인할 수 있습니다.',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: ListView.builder(
+                    itemCount: notifications.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        leading: Icon(Icons.notifications),
+                        title: Text(notifications[index]['title']),
+                        subtitle: Text(notifications[index]['subtitle']),
+                      );
+                    },
+                  ),
+                ),
     );
   }
 }

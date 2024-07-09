@@ -104,6 +104,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.3.0"
+  gantt_view:
+    dependency: "direct main"
+    description:
+      name: gantt_view
+      sha256: "14631f1649697a218f52621cc0a0db70c078aa0c2b6581b115b487a0dcc04d8a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.3"
   google_identity_services_web:
     dependency: transitive
     description:

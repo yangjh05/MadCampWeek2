@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:madcamp_week2/add_task_page.dart';
 
 class OrganizationTaskList extends StatefulWidget {
   final user_info, org_info;
@@ -53,7 +54,7 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
         title: Text('업무 리스트'),
         titleTextStyle: TextStyle(
           color: Colors.white,
-          fontSize: 24,
+          fontSize: 20,
         ),
         centerTitle: true,
         leading: IconButton(
@@ -115,7 +116,13 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
                   SizedBox(width: 8.0),
                   ElevatedButton(
                     onPressed: () {
-                      // 작성 버튼 눌렀을 때의 동작
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) {
+                        return AddTaskPage(
+                          user_info: user_info,
+                          org_info: org_info,
+                        );
+                      }));
                     },
                     child: Icon(
                       Icons.post_add,

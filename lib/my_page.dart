@@ -27,7 +27,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
         title: Text('마이페이지'),
         titleTextStyle: TextStyle(
           color: Colors.white,
-          fontSize: 24,
+          fontSize: 20,
         ),
         centerTitle: true,
       ),
@@ -51,7 +51,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 4.0),
+              SizedBox(height: 8.0),
               Text(
                 user_info['email'] ?? "No e-mail Yet",
                 style: TextStyle(
@@ -60,7 +60,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
                   fontSize: 16,
                 ),
               ),
-              SizedBox(height: 4.0),
+              SizedBox(height: 8.0),
               Text(
                 "Tel: ${user_info['phone_number'] ?? "No phone-number yet"}",
                 style: TextStyle(
@@ -75,7 +75,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
                 height: 150, // 고정된 높이
                 padding: EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey),
+                  border: Border.all(color: Colors.grey.shade400),
                   borderRadius: BorderRadius.circular(16.0),
                 ),
                 child: SingleChildScrollView(
@@ -89,7 +89,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
                   ),
                 ),
               ),
-              SizedBox(height: 16.0),
+              SizedBox(height: 20.0),
               ElevatedButton(
                 onPressed: () {
                   Navigator.push(
