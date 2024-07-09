@@ -31,6 +31,7 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
         'Content-Type': 'application/json; charset=UTF-8',
       },
       body: jsonEncode(<String, String>{
+        'user_id': user_info['user_id'].toString(),
         'organization_id': org_info['organization_id'].toString(),
       }),
     );

@@ -37,7 +37,7 @@ class _NotificationsTabState extends State<NotificationsTab> {
 
     if (response.statusCode == 200) {
       setState(() {
-        notifications = jsonDecode(response.body)['notifications'] ?? [];
+        notifications = jsonDecode(response.body)['res'][0] ?? [];
         isLoading = false;
       });
       print(notifications);
@@ -98,8 +98,14 @@ class _NotificationsTabState extends State<NotificationsTab> {
                     itemBuilder: (context, index) {
                       return ListTile(
                         leading: Icon(Icons.notifications),
-                        title: Text(notifications[index]['title']),
-                        subtitle: Text(notifications[index]['subtitle']),
+                        title: Text(
+                          notifications[index]['title'],
+                          style: TextStyle(
+                              color: notifications[index]['notice_type'] == 0
+                                  ? Colors.red
+                                  : Colors.green),
+                        ),
+                        subtitle: Text(notifications[index]['description']),
                       );
                     },
                   ),

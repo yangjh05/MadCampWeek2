@@ -6,6 +6,7 @@ import 'package:gantt_view/gantt_view.dart';
 import 'package:madcamp_week2/accept_application.dart';
 import 'package:madcamp_week2/add_notice_page.dart';
 import 'package:madcamp_week2/add_organization_page.dart';
+import 'package:madcamp_week2/home.dart';
 import 'package:madcamp_week2/organization_tab.dart';
 import 'organization_find_people.dart';
 import 'organization_my_page.dart';
@@ -496,11 +497,90 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                             Color.fromARGB(255, 243, 61, 33), // 버튼 배경색
                         foregroundColor: Colors.white, // 텍스트 색상
                         label: '단체 탈퇴하기',
-                        onTap: () {},
+                        onTap: () async {
+                          final response = await http.post(
+                              Uri.parse(
+                                  "https://172.10.7.95/api/delete_subtree"),
+                              headers: <String, String>{
+                                'Content-Type':
+                                    'application/json; charset=UTF-8',
+                              },
+                              body: jsonEncode(<String, String>{
+                                'user_id': user_info['user_id'].toString(),
+                              }));
+
+                          if (response.statusCode == 200) {
+                            setState(() {
+                              print(response.body);
+                            });
+                            Navigator.of(context).pop();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Failed to get response: ${response.body}')),
+                            );
+                            throw Exception();
+                          }
+                        },
                       )
                     ],
                   )
-                : null,
+                : SpeedDial(
+                    animatedIcon: AnimatedIcons.menu_close,
+                    backgroundColor: Color(0xfff9e2af),
+                    icon: Icons.settings,
+                    spaceBetweenChildren: 15.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0)),
+                    children: [
+                      SpeedDialChild(
+                        child: Icon(
+                          Icons.delete_outline,
+                          size: 20.0,
+                          color: Colors.white, // 아이콘 색상
+                        ),
+                        backgroundColor:
+                            Color.fromARGB(255, 243, 61, 33), // 버튼 배경색
+                        foregroundColor: Colors.white, // 텍스트 색상
+                        label: '단체 탈퇴하기',
+                        onTap: () async {
+                          final response = await http.post(
+                              Uri.parse(
+                                  "https://172.10.7.95/api/delete_subtree"),
+                              headers: <String, String>{
+                                'Content-Type':
+                                    'application/json; charset=UTF-8',
+                              },
+                              body: jsonEncode(<String, String>{
+                                'user_id': user_info['user_id'].toString(),
+                                'organization_id':
+                                    org_info['organization_id'].toString(),
+                              }));
+
+                          if (response.statusCode == 200) {
+                            setState(() {
+                              print(response.body);
+                            });
+                            Navigator.of(context).pushReplacement(
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return HomeScreen(user_info: user_info);
+                                },
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Failed to get response: ${response.body}')),
+                            );
+                            throw Exception();
+                          }
+                        },
+                      )
+                    ],
+                  ),
           );
   }
 }
