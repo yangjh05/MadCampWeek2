@@ -282,13 +282,14 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                     ),
                   ),
                   Container(
-                    height: 160, // 공지사항 박스의 높이
+                    height: 160, // 공지사항 박스의 높이를 조정합니다.
                     child: ListView.builder(
+                      clipBehavior: Clip.none,
                       scrollDirection: Axis.horizontal,
                       itemCount: notices.length + 1, // 공지 추가 카드를 위해 +1
                       itemBuilder: (context, index) {
-                        if (index == notices.length) {
-                          // 마지막에 공지 추가 카드
+                        if (index == 0) {
+                          // 첫 번째에 공지 추가 카드
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -340,7 +341,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                             ),
                           );
                         } else {
-                          final notice = notices[index];
+                          final notice = notices[index - 1];
                           return NoticeCard(
                             title: notice['title'],
                             content: notice['content'],
