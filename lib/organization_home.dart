@@ -283,11 +283,13 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                   Container(
                     height: 160, // 공지사항 박스의 높이
                     child: ListView.builder(
+                      clipBehavior: Clip.none,
                       scrollDirection: Axis.horizontal,
                       itemCount: notices.length + 1, // 공지 추가 카드를 위해 +1
+                      reverse: true, // 역순으로 리스트를 표시
                       itemBuilder: (context, index) {
                         if (index == notices.length) {
-                          // 마지막에 공지 추가 카드
+                          // 첫 번째에 공지 추가 카드
                           return GestureDetector(
                             onTap: () {
                               Navigator.push(
@@ -339,7 +341,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                             ),
                           );
                         } else {
-                          final notice = notices[index];
+                          final notice = notices[notices.length - 1 - index];
                           return NoticeCard(
                             title: notice['title'],
                             content: notice['content'],
@@ -515,7 +517,6 @@ class NoticeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: 200,
-      height: 200,
       margin: EdgeInsets.only(left: 16.0),
       padding: EdgeInsets.all(16.0),
       decoration: BoxDecoration(
