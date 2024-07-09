@@ -30,12 +30,14 @@ class _OrganizationHomeState extends State<OrganizationHome> {
 
   dynamic organization_list = [];
   dynamic role_info = [];
+  List<dynamic> notices = [];
 
   @override
   void initState() {
     super.initState();
     getMyOrganizations();
     getUserInformation();
+    getNotices();
     setState(() {
       isLoadingComplete = true;
     });
@@ -92,6 +94,30 @@ class _OrganizationHomeState extends State<OrganizationHome> {
         SnackBar(content: Text('Failed to get response: ${response.body}')),
       );
       throw Exception();
+    }
+  }
+
+  Future<void> getNotices() async {
+    final response = await http.post(
+      Uri.parse("https://172.10.7.95/api/get_notices"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'organization_id': org_info['organization_id'].toString(),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        notices = jsonDecode(response.body)['notices'] ?? [];
+      });
+      print(notices);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load notices')),
+      );
+      throw Exception('Failed to load notices');
     }
   }
 
@@ -256,60 +282,70 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                   ),
                   Container(
                     height: 160, // 공지사항 박스의 높이
-                    child: ListView(
+                    child: ListView.builder(
                       scrollDirection: Axis.horizontal,
-                      children: [
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => AddNoticePage(
-                                  user_info: user_info,
-                                  org_info: org_info,
-                                ),
-                              ),
-                            );
-                          },
-                          child: Container(
-                            width: 200,
-                            margin: EdgeInsets.only(left: 16.0),
-                            padding: EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: Color(0xFFF4EDF5),
-                              borderRadius: BorderRadius.circular(8.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  offset: Offset(0, 2),
-                                  blurRadius: 4.0,
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.add,
-                                    size: 40.0,
-                                    color: Colors.grey,
+                      itemCount: notices.length + 1, // 공지 추가 카드를 위해 +1
+                      itemBuilder: (context, index) {
+                        if (index == notices.length) {
+                          // 마지막에 공지 추가 카드
+                          return GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AddNoticePage(
+                                    user_info: user_info,
+                                    org_info: org_info,
                                   ),
-                                  SizedBox(width: 8.0),
-                                  Text(
-                                    '공지 추가',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey,
-                                    ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              width: 200,
+                              margin: EdgeInsets.only(left: 16.0),
+                              padding: EdgeInsets.all(16.0),
+                              decoration: BoxDecoration(
+                                color: Color(0xFFF4EDF5),
+                                borderRadius: BorderRadius.circular(8.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black12,
+                                    offset: Offset(0, 2),
+                                    blurRadius: 4.0,
                                   ),
                                 ],
                               ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.add,
+                                      size: 40.0,
+                                      color: Colors.grey,
+                                    ),
+                                    SizedBox(width: 8.0),
+                                    Text(
+                                      '공지 추가',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ],
+                          );
+                        } else {
+                          final notice = notices[index];
+                          return NoticeCard(
+                            title: notice['title'],
+                            content: notice['content'],
+                          );
+                        }
+                      },
                     ),
                   ),
                   Padding(

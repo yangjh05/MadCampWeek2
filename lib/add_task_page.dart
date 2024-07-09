@@ -14,6 +14,11 @@ class _AddTaskPageState extends State<AddTaskPage> {
   final _formKey = GlobalKey<FormState>();
   String _title = '';
   String _description = '';
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  TextEditingController _startDateController = TextEditingController();
+  TextEditingController _endDateController = TextEditingController();
 
   Future<void> _addTask() async {
     if (_formKey.currentState!.validate()) {
@@ -27,6 +32,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
           'organization_id': widget.org_info['organization_id'].toString(),
           'title': _title,
           'description': _description,
+          'start_date': _startDate!.toIso8601String(),
+          'end_date': _endDate!.toIso8601String(),
         }),
       );
 
@@ -35,6 +42,32 @@ class _AddTaskPageState extends State<AddTaskPage> {
       } else {
         throw Exception('Failed to add task');
       }
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isStart) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: isStart
+          ? (_startDate ?? DateTime.now())
+          : (_endDate ?? DateTime.now()),
+      firstDate: isStart ? DateTime(2000) : (_startDate ?? DateTime(2000)),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          _startDate = picked;
+          _startDateController.text = '${_startDate!.toLocal()}'.split(' ')[0];
+          if (_endDate != null && _endDate!.isBefore(_startDate!)) {
+            _endDate = null;
+            _endDateController.text = '';
+          }
+        } else {
+          _endDate = picked;
+          _endDateController.text = '${_endDate!.toLocal()}'.split(' ')[0];
+        }
+      });
     }
   }
 
@@ -99,6 +132,38 @@ class _AddTaskPageState extends State<AddTaskPage> {
                 onSaved: (value) {
                   _description = value!;
                 },
+              ),
+              SizedBox(height: 16.0),
+              TextFormField(
+                controller: _startDateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Start Date',
+                  hintText: 'Select start date',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select start date';
+                  }
+                  return null;
+                },
+                onTap: () => _selectDate(context, true),
+              ),
+              SizedBox(height: 8.0),
+              TextFormField(
+                controller: _endDateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'End Date',
+                  hintText: 'Select end date',
+                ),
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Please select end date';
+                  }
+                  return null;
+                },
+                onTap: () => _selectDate(context, false),
               ),
               SizedBox(height: 20),
               ElevatedButton(

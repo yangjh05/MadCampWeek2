@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddNoticePage extends StatefulWidget {
   final Map user_info;
-  final Map? org_info;
+  final Map org_info;
 
-  AddNoticePage({required this.user_info, this.org_info});
+  AddNoticePage({required this.user_info, required this.org_info});
 
   @override
   _AddNoticePageState createState() => _AddNoticePageState();
@@ -13,6 +15,40 @@ class AddNoticePage extends StatefulWidget {
 class _AddNoticePageState extends State<AddNoticePage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
+
+  Future<void> _sendNotice() async {
+    final String title = _titleController.text;
+    final String content = _contentController.text;
+
+    if (title.isEmpty || content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('제목과 내용을 모두 입력하세요.')),
+      );
+      return;
+    }
+
+    final response = await http.post(
+      Uri.parse("https://172.10.7.95/api/send_notices"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'organization_id': widget.org_info['organization_id'].toString(),
+        'user_id': widget.user_info['user_id'].toString(),
+        'title': title,
+        'content': content,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print(response.body);
+      Navigator.of(context).pop();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to send notice')),
+      );
+    }
+  }
 
   @override
   void dispose() {
@@ -46,10 +82,7 @@ class _AddNoticePageState extends State<AddNoticePage> {
                 padding: EdgeInsets.symmetric(
                     vertical: 8.0, horizontal: 16.0), // 내부 패딩 추가
               ),
-              onPressed: () {
-                // Implement the post submission logic here
-                Navigator.of(context).pop();
-              },
+              onPressed: _sendNotice,
               child: Text(
                 '완료',
                 style: TextStyle(color: Colors.white),
@@ -69,9 +102,10 @@ class _AddNoticePageState extends State<AddNoticePage> {
               decoration: InputDecoration(
                 hintText: '제목',
                 hintStyle: TextStyle(
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey),
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
                 border: InputBorder.none,
               ),
               style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
