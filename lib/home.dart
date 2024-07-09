@@ -126,19 +126,43 @@ class _HomeScreenState extends State<HomeScreen>
   OverlayEntry _createOverlayEntry() {
     return OverlayEntry(
       builder: (context) => Positioned(
-        top: 100.0,
-        left: MediaQuery.of(context).size.width / 2 - 100,
+        bottom: 80.0,
+        left: MediaQuery.of(context).size.width / 2 - 150,
         child: AnimatedOpacity(
           opacity: _visible ? 1.0 : 0.0,
           duration: Duration(milliseconds: 500),
-          child: Container(
-            width: 200.0,
-            padding: EdgeInsets.all(10.0),
-            color: Colors.green,
-            child: Center(
-              child: Text(
-                '참가신청 완료되었습니다!',
-                style: TextStyle(color: Colors.white),
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              width: 300.0,
+              padding: EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: Color(0xFFF4EDF5),
+                borderRadius: BorderRadius.circular(8.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black26,
+                    offset: Offset(0, 4),
+                    blurRadius: 10.0,
+                  ),
+                ],
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.check_circle, color: Colors.black, size: 30),
+                  SizedBox(width: 10.0),
+                  Expanded(
+                    child: Text(
+                      '참가신청 완료되었습니다!',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

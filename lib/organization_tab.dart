@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'organization_find_people.dart';
 import 'organization_home.dart';
-import 'organization_my_page.dart';
+import 'organization_task_list.dart';
 
 class OrganizationNavigator extends StatefulWidget {
   final user_info, org_info, org_num;
@@ -23,7 +23,7 @@ class _OrganizationNavigatorState extends State<OrganizationNavigator> {
       {required this.user_info, required this.org_info, required this.org_num});
 
   List<Widget> _widgetOptions() => <Widget>[
-        OrganizationMyPage(
+        OrganizationTaskList(
           user_info: user_info,
           org_info: org_info,
         ),
@@ -55,8 +55,8 @@ class _OrganizationNavigatorState extends State<OrganizationNavigator> {
       bottomNavigationBar: BottomNavigationBar(
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'My Page',
+            icon: Icon(Icons.task),
+            label: 'Task List',
           ),
           BottomNavigationBarItem(
             icon: Container(

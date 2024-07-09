@@ -93,6 +93,7 @@ class _OrganizationFindPeopleState extends State<OrganizationFindUser> {
                     '전체 ${info_list.length + 1}명', // 전체 구성원 수
                     style: TextStyle(fontSize: 16),
                   ),
+                  SizedBox(height: 8.0),
                   Expanded(
                     child: ListView.builder(
                       itemCount: info_list.length,
@@ -106,12 +107,23 @@ class _OrganizationFindPeopleState extends State<OrganizationFindUser> {
                                 backgroundImage: AssetImage(
                                     'assets/profile_icon.png'), // 기본 이미지 경로 설정
                               ),
-                              title: Text(member['username']),
+                              title: Text(member['username'],
+                                  style: TextStyle(
+                                      fontFamily: 'PlusJakartaSans',
+                                      fontSize: 16)),
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(member['role_name']),
-                                  Text(member['email']),
+                                  Text(
+                                    member['role_name'],
+                                    style: TextStyle(
+                                        fontFamily: 'PlusJakartaSans',
+                                        fontSize: 16),
+                                  ),
+                                  Text(member['email'],
+                                      style: TextStyle(
+                                          fontFamily: 'PlusJakartaSans',
+                                          fontSize: 16)),
                                 ],
                               ),
                             ),

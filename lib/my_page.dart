@@ -36,14 +36,6 @@ class _OrganizationMyPageState extends State<MyPageTab> {
         child: Center(
           child: Column(
             children: [
-              // Text(
-              //   org_info['org_name'],
-              //   style: TextStyle(
-              //     fontSize: 24,
-              //     fontFamily: 'PlusJakartSans',
-              //     fontWeight: FontWeight.bold,
-              //   ),
-              // ),
               SizedBox(height: 16.0),
               CircleAvatar(
                 radius: 70, // 이미지의 크기를 설정합니다.
@@ -98,7 +90,7 @@ class _OrganizationMyPageState extends State<MyPageTab> {
                 ),
               ),
               SizedBox(height: 16.0),
-              ElevatedButton.icon(
+              ElevatedButton(
                 onPressed: () {
                   Navigator.push(
                     context,
@@ -110,18 +102,26 @@ class _OrganizationMyPageState extends State<MyPageTab> {
                     ),
                   );
                 },
-                icon: Icon(Icons.edit, color: Colors.white),
-                label: Text(
-                  "프로필 수정",
-                  style: TextStyle(color: Colors.white),
-                ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF495ECA),
+                  backgroundColor: Colors.white,
                   minimumSize: Size(double.infinity, 48),
                   side: BorderSide(color: Colors.grey),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
+                  shadowColor: Colors.grey.withOpacity(0.5), // 섀도우 색상
+                  elevation: 5, // 섀도우 높이
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    Icon(Icons.edit, color: Colors.black),
+                    SizedBox(width: 8.0),
+                    Text(
+                      "프로필 수정",
+                      style: TextStyle(color: Colors.black, fontSize: 16),
+                    ),
+                  ],
                 ),
               ),
               SizedBox(height: 8.0),
