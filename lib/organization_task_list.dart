@@ -1,4 +1,6 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 class OrganizationTaskList extends StatefulWidget {
   final user_info, org_info;
@@ -11,12 +13,40 @@ class OrganizationTaskList extends StatefulWidget {
 
 class _OrganizationTaskListState extends State<OrganizationTaskList> {
   final user_info, org_info;
+  List<dynamic> taskList = [];
+
   _OrganizationTaskListState({required this.user_info, required this.org_info});
+
+  @override
+  void initState() {
+    super.initState();
+    getTasks();
+  }
+
+  Future<void> getTasks() async {
+    final response = await http.post(
+      Uri.parse("https://172.10.7.95/api/get_tasks"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'organization_id': org_info['organization_id'].toString(),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        taskList = jsonDecode(response.body)['tasks'];
+      });
+    } else {
+      throw Exception('Failed to load tasks');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Color(0xFFF5F5F5),
       appBar: AppBar(
         backgroundColor: Color(0xFF495ECA),
         automaticallyImplyLeading: false,
@@ -26,45 +56,36 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
           fontSize: 24,
         ),
         centerTitle: true,
+        leading: IconButton(
+          icon: Icon(
+            Icons.chevron_left,
+            color: Colors.white,
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
       ),
       body: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.only(bottom: 80.0), // 검색바 공간 확보
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: Column(
               children: [
-                TaskCard(
-                  title: '2024S 일정',
-                  description: '2024S DB에 속함',
-                ),
-                TaskCard(
-                  title: '2024S DB',
-                  description: '공지사항에 속함',
-                ),
-                TaskCard(
-                  title: '공통과제 / 스크럼',
-                  description: '공지사항에 속함',
-                ),
-                TaskCard(
-                  title: '빠른 메모',
-                  description: '개인 메모지',
-                ),
-                TaskCard(
-                  title: '공지사항',
-                  description: '2024S DB에 속함',
-                ),
-                TaskCard(
-                  title: '스크럼 회의록',
-                  description: '2024S 스크럼 회의록에 속함',
-                ),
-                TaskCard(
-                  title: '2반반',
-                  description: '2024S 분반에 속함',
-                ),
-                TaskCard(
-                  title: 'KCLOUD VM / 모바일 VPN 계정',
-                  description: '공지사항에 속함',
+                SizedBox(height: 25.0),
+                Expanded(
+                  child: ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 20.0),
+                    itemCount: taskList.length,
+                    itemBuilder: (context, index) {
+                      return TaskCard(
+                        title: taskList[index]['title'],
+                        description: taskList[index]['description'],
+                        isFirst: index == 0,
+                        isLast: index == taskList.length - 1,
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
@@ -75,7 +96,6 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
             right: 0,
             child: Container(
               padding: const EdgeInsets.all(16.0),
-              color: Colors.white, // 검색바 배경색
               child: Row(
                 children: [
                   Expanded(
@@ -120,23 +140,40 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
 class TaskCard extends StatelessWidget {
   final String title;
   final String description;
+  final bool isFirst;
+  final bool isLast;
 
   TaskCard({
     required this.title,
     required this.description,
+    required this.isFirst,
+    required this.isLast,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(vertical: 10.0),
-      child: ListTile(
-        leading: Icon(Icons.calendar_today, color: Colors.black),
-        title: Text(
-          title,
-          style: TextStyle(fontWeight: FontWeight.bold),
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: 2.0), // 간격을 좁게 설정
+      child: Card(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(isFirst ? 16.0 : 0),
+            topRight: Radius.circular(isFirst ? 16.0 : 0),
+            bottomLeft: Radius.circular(isLast ? 16.0 : 0),
+            bottomRight: Radius.circular(isLast ? 16.0 : 0),
+          ),
+          side: BorderSide(color: Colors.grey[300]!),
         ),
-        subtitle: Text(description),
+        margin: EdgeInsets.zero,
+        child: ListTile(
+          leading: Icon(Icons.calendar_today, color: Colors.black),
+          title: Text(
+            title,
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(description),
+        ),
       ),
     );
   }

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'organization_page.dart';
 import 'my_page.dart';
-import 'setting_page.dart';
+import 'notifications_page.dart';
 import 'package:http/http.dart' as http;
 
 class HomeScreen extends StatefulWidget {
@@ -211,7 +211,7 @@ class _HomeScreenState extends State<HomeScreen>
         OrganizationTab(
           user_info: user_info,
         ),
-        SettingsTab(
+        NotificationsTab(
           user_info: user_info,
         ),
       ];
@@ -543,8 +543,8 @@ class _HomeScreenState extends State<HomeScreen>
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.access_alarm),
-            label: 'Alarms',
+            icon: Icon(Icons.notifications_none),
+            label: 'Notifications',
           ),
         ],
         currentIndex: _selectedIndex,

@@ -138,7 +138,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(height: 16),
+                          SizedBox(height: 8),
                           if (organization_list.isNotEmpty)
                             DropdownButtonHideUnderline(
                               child: DropdownButton<String>(
@@ -151,7 +151,8 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                                     value: value['org_name'],
                                     child: Text(
                                       value['org_name'],
-                                      style: TextStyle(color: Colors.white),
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 24),
                                     ),
                                   );
                                 }).toList(),
