@@ -63,29 +63,98 @@ class _AcceptApplicationState extends State<AcceptApplication> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Color(0xFF495ECA),
-        automaticallyImplyLeading: false,
-        title: Text('가입 신청 회원'),
-        titleTextStyle: TextStyle(
-          color: Colors.white,
-          fontSize: 24,
-        ),
-        centerTitle: true,
-        leading: IconButton(
-          icon: Icon(
-            Icons.chevron_left,
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Color(0xFF495ECA),
+          automaticallyImplyLeading: false,
+          title: Text('가입 신청 회원'),
+          titleTextStyle: TextStyle(
             color: Colors.white,
+            fontSize: 24,
           ),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
+          centerTitle: true,
+          leading: IconButton(
+            icon: Icon(
+              Icons.chevron_left,
+              color: Colors.white,
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
         ),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(30.0),
-      ),
-    );
+        body: Scaffold(
+          body: isLoadingComplete
+              ? Padding(
+                  padding: EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '전체 ${info_list.length}명', // 전체 구성원 수
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Expanded(
+                        child: ListView.builder(
+                          itemCount: info_list.length,
+                          itemBuilder: (context, index) {
+                            var member = info_list[index];
+                            return Column(
+                              children: [
+                                ListTile(
+                                    leading: CircleAvatar(
+                                      radius: 30,
+                                      backgroundImage: AssetImage(
+                                          'assets/profile_icon.png'), // 기본 이미지 경로 설정
+                                    ),
+                                    title: Text(member['username']),
+                                    subtitle: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(member['email']),
+                                      ],
+                                    ),
+                                    trailing: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // 버튼을 눌렀을 때 실행될 코드 작성
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(30,
+                                                  30), // 너비와 높이를 설정하여 버튼 크기 조정
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal:
+                                                      8), // 버튼 내용의 패딩 설정
+                                            ),
+                                            child: Icon(Icons.circle_outlined),
+                                          ),
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              // 버튼을 눌렀을 때 실행될 코드 작성
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              minimumSize: Size(30,
+                                                  30), // 너비와 높이를 설정하여 버튼 크기 조정
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal:
+                                                      8), // 버튼 내용의 패딩 설정
+                                            ),
+                                            child: Icon(Icons.close),
+                                          ),
+                                        ])),
+                                Divider(),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              : Center(child: CircularProgressIndicator()),
+        ));
   }
 }

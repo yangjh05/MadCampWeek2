@@ -26,7 +26,7 @@ class _HomeScreenState extends State<HomeScreen>
   double appbarHeight = 0.21;
   late AnimationController _controller;
   late Animation<double> _animation;
-  late OverlayEntry _overlayEntry;
+  late OverlayEntry? _overlayEntry = null;
   TextEditingController searchController = TextEditingController();
   bool _visible = false;
 
@@ -102,28 +102,33 @@ class _HomeScreenState extends State<HomeScreen>
     );
     if (response.statusCode == 500)
       throw Exception();
-    else
+    else if (response.statusCode == 200)
       return true;
+    else
+      return false;
   }
 
-  void _showMessage() {
-    _overlayEntry = _createOverlayEntry();
-    Overlay.of(context).insert(_overlayEntry);
+  void _showMessage(bool isFine) {
+    if (_visible) return;
+    _overlayEntry = _createOverlayEntry(isFine);
+    Overlay.of(context).insert(_overlayEntry!);
+
     setState(() {
       _visible = true;
     });
 
     Future.delayed(Duration(seconds: 2), () {
-      Future.delayed(Duration(milliseconds: 500), () {
-        _overlayEntry.remove();
-      });
       setState(() {
         _visible = false;
+      });
+
+      Future.delayed(Duration(milliseconds: 500), () {
+        _overlayEntry!.remove();
       });
     });
   }
 
-  OverlayEntry _createOverlayEntry() {
+  OverlayEntry _createOverlayEntry(bool isFine) {
     return OverlayEntry(
       builder: (context) => Positioned(
         bottom: 80.0,
@@ -154,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen>
                   SizedBox(width: 10.0),
                   Expanded(
                     child: Text(
-                      '참가신청 완료되었습니다!',
+                      isFine ? '참가신청 완료되었습니다!' : '이미 완료된 신청입니다.',
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 16,
@@ -470,7 +475,10 @@ class _HomeScreenState extends State<HomeScreen>
                                                       await applyParticipation(
                                                           organization[
                                                               'organization_id']);
-                                                  if (res) _showMessage();
+                                                  if (res)
+                                                    _showMessage(true);
+                                                  else
+                                                    _showMessage(false);
                                                 },
                                                 style: ElevatedButton.styleFrom(
                                                   foregroundColor: Colors.white,

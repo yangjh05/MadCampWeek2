@@ -87,6 +87,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
         print(role_info);
       });
     } else {
+      final uo_info = jsonDecode(response.body);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to get response: ${response.body}')),
       );
