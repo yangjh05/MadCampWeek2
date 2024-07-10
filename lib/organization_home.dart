@@ -546,6 +546,62 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                         foregroundColor: Colors.white, // 텍스트 색상
                         label: '단체 탈퇴하기',
                         onTap: () async {
+                          if (org_info['user_state'] == 2) {
+                            final managers = await http.post(
+                                Uri.parse(
+                                    "https://172.10.7.95/api/get_nonmanager_users"),
+                                headers: <String, String>{
+                                  'Content-Type':
+                                      'application/json; charset=UTF-8',
+                                },
+                                body: jsonEncode(<String, String>{
+                                  'organization_id': org_info['organization_id']
+                                }));
+                            final manager_list =
+                                jsonDecode(managers.body)['users'];
+                            if (manager_list.length == 1) {
+                              final non_managers = await http.post(
+                                  Uri.parse(
+                                      "https://172.10.7.95/api/get_nonmanager_users"),
+                                  headers: <String, String>{
+                                    'Content-Type':
+                                        'application/json; charset=UTF-8',
+                                  },
+                                  body: jsonEncode(<String, String>{
+                                    'organization_id':
+                                        org_info['organization_id']
+                                  }));
+                              final non_manager_list =
+                                  jsonDecode(non_managers.body)['users'];
+                              if (non_manager_list.length == 0) {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('경고'),
+                                      content: Text(
+                                          '당신이 마지막 남은 회원입니다. 당신이 탈퇴하면 단체가 삭제됩니다. 계속하시겠습니까?'),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          child: Text('취소'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            return;
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('계속'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              }
+                            }
+                          }
                           final response = await http.post(
                               Uri.parse(
                                   "https://172.10.7.95/api/delete_subtree"),
