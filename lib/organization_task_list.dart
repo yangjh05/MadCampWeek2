@@ -16,7 +16,9 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
   final user_info, org_info;
   int cnt = 0;
   List<dynamic> taskList = [];
+  List<dynamic> filteredTaskList = [];
   bool _isLoadingComplete = false;
+  TextEditingController _searchController = TextEditingController();
 
   _OrganizationTaskListState({required this.user_info, required this.org_info});
 
@@ -24,6 +26,7 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
   void initState() {
     super.initState();
     getTasks();
+    _searchController.addListener(_filterTasks);
   }
 
   Future<void> getTasks() async {
@@ -41,11 +44,61 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
     if (response.statusCode == 200) {
       setState(() {
         taskList = jsonDecode(response.body)['tasks'];
+        filteredTaskList = taskList;
         _isLoadingComplete = true;
       });
     } else {
       throw Exception('Failed to load tasks');
     }
+  }
+
+  void _filterTasks() {
+    String query = _searchController.text.toLowerCase();
+    setState(() {
+      filteredTaskList = taskList
+          .where((task) => task['title'].toLowerCase().contains(query))
+          .toList();
+    });
+  }
+
+  void showTaskDetails(BuildContext context, String title, String description,
+      String start_date, String end_date) {
+    String formattedStartDate = start_date.split('T')[0];
+    String formattedEndDate = end_date.split('T')[0];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          title: Text(title),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('업무 설명', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text(description),
+              SizedBox(height: 10),
+              Text('업무 기간', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text('$formattedStartDate ~ $formattedEndDate'),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text(
+                '닫기',
+                style: TextStyle(color: Color(0xFF495ECA)),
+              ),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -82,13 +135,22 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
                       Expanded(
                         child: ListView.builder(
                           padding: EdgeInsets.symmetric(horizontal: 20.0),
-                          itemCount: taskList.length,
+                          itemCount: filteredTaskList.length,
                           itemBuilder: (context, index) {
                             return TaskCard(
-                              title: taskList[index]['title'],
-                              description: taskList[index]['description'],
+                              title: filteredTaskList[index]['title'],
+                              description: filteredTaskList[index]
+                                  ['description'],
                               isFirst: index == 0,
-                              isLast: index == taskList.length - 1,
+                              isLast: index == filteredTaskList.length - 1,
+                              onTap: () {
+                                showTaskDetails(
+                                    context,
+                                    filteredTaskList[index]['title'],
+                                    filteredTaskList[index]['description'],
+                                    filteredTaskList[index]['start_date'],
+                                    filteredTaskList[index]['end_date']);
+                              },
                             );
                           },
                         ),
@@ -106,6 +168,7 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
                       children: [
                         Expanded(
                           child: TextField(
+                            controller: _searchController,
                             decoration: InputDecoration(
                               hintText: '검색',
                               prefixIcon: Icon(Icons.search),
@@ -155,7 +218,6 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
             ),
           )
         : Center(child: CircularProgressIndicator());
-    ;
   }
 }
 
@@ -164,37 +226,44 @@ class TaskCard extends StatelessWidget {
   final String description;
   final bool isFirst;
   final bool isLast;
+  final VoidCallback onTap;
 
   TaskCard({
     required this.title,
     required this.description,
     required this.isFirst,
     required this.isLast,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      // 간격을 좁게 설정
-      child: Card(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(isFirst ? 16.0 : 0),
-            topRight: Radius.circular(isFirst ? 16.0 : 0),
-            bottomLeft: Radius.circular(isLast ? 16.0 : 0),
-            bottomRight: Radius.circular(isLast ? 16.0 : 0),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        child: Card(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(isFirst ? 16.0 : 0),
+              topRight: Radius.circular(isFirst ? 16.0 : 0),
+              bottomLeft: Radius.circular(isLast ? 16.0 : 0),
+              bottomRight: Radius.circular(isLast ? 16.0 : 0),
+            ),
+            side: BorderSide(color: Colors.grey[300]!),
           ),
-          side: BorderSide(color: Colors.grey[300]!),
-        ),
-        margin: EdgeInsets.zero,
-        child: ListTile(
-          leading: Icon(Icons.calendar_today, color: Colors.black),
-          title: Text(
-            title,
-            style: TextStyle(fontWeight: FontWeight.bold),
+          margin: EdgeInsets.zero,
+          child: Padding(
+            padding: const EdgeInsets.all(10.0),
+            child: ListTile(
+              leading: Icon(Icons.calendar_today, color: Colors.black),
+              title: Text(
+                title,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              subtitle: Text(description),
+            ),
           ),
-          subtitle: Text(description),
         ),
       ),
     );

@@ -132,27 +132,34 @@ class _AddTaskPageState extends State<AddTaskPage> {
         backgroundColor: Colors.white,
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(20.0),
             child: Form(
               key: _formKey,
               child: Column(
                 children: <Widget>[
-                  DropdownButton<int>(
-                    value: selectedUserId,
-                    hint: Text('Select User'),
-                    onChanged: (int? newValue) {
-                      setState(() {
-                        selectedUserId = newValue;
-                      });
-                    },
-                    items: subTreeUsers.map<DropdownMenuItem<int>>((user) {
-                      print("user");
-                      print(user);
-                      return DropdownMenuItem<int>(
-                        value: user['user_id'],
-                        child: Text(user['username']),
-                      );
-                    }).toList(),
+                  InputDecorator(
+                    decoration: InputDecoration(
+                      labelText: 'Select User',
+                      border: UnderlineInputBorder(),
+                      // contentPadding: EdgeInsets.symmetric(horizontal: 12.0),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<int>(
+                        value: selectedUserId,
+                        hint: Text('Select User'),
+                        onChanged: (int? newValue) {
+                          setState(() {
+                            selectedUserId = newValue;
+                          });
+                        },
+                        items: subTreeUsers.map<DropdownMenuItem<int>>((user) {
+                          return DropdownMenuItem<int>(
+                            value: user['user_id'],
+                            child: Text(user['username']),
+                          );
+                        }).toList(),
+                      ),
+                    ),
                   ),
                   TextFormField(
                     decoration: InputDecoration(labelText: 'Title'),
@@ -177,6 +184,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
                     onSaved: (value) {
                       _description = value!;
                     },
+                    maxLines: 4,
                   ),
                   SizedBox(height: 16.0),
                   TextFormField(

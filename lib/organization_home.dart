@@ -431,7 +431,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                                   task.data.title,
                                   style: const TextStyle(
                                     fontFamily: 'PlusJakartSans',
-                                    fontWeight: FontWeight.bold,
+                                    // fontWeight: FontWeight.bold,
                                     color: Colors.black,
                                   ),
                                 ),
