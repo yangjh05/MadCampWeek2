@@ -84,11 +84,12 @@ class _AddTaskPageState extends State<AddTaskPage> {
   }
 
   Future<void> _selectDate(BuildContext context, bool isStart) async {
+    if (_startDate == null && isStart == false) return;
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: isStart
           ? (_startDate ?? DateTime.now())
-          : (_endDate ?? DateTime.now()),
+          : (_endDate ?? (_startDate!)),
       firstDate: isStart ? DateTime(2000) : (_startDate ?? DateTime(2000)),
       lastDate: DateTime(2101),
     );

@@ -75,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       print(response.body);
+      print(response.statusCode);
 
       // 예시: 로그인 성공 시 다른 화면으로 이동
       if (response.statusCode == 200) {
