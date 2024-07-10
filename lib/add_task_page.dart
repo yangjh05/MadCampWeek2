@@ -66,7 +66,7 @@ class _AddTaskPageState extends State<AddTaskPage> {
         },
         body: jsonEncode(<String, String>{
           'organization_id': widget.org_info['organization_id'].toString(),
-          'root_user_id': widget.user_info['user_id'].toString(),
+          'root_user_id': selectedUserId.toString(),
           'title': _title,
           'description': _description,
           'start_date': _startDate!.toIso8601String(),

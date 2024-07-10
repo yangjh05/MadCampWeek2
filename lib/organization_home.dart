@@ -25,7 +25,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
   final user_info, org_info, org_num;
   _OrganizationHomeState(
       {required this.user_info, required this.org_info, required this.org_num});
-  double appbarHeight = 0.30;
+  double appbarHeight = 0.37;
   bool isLoadingComplete = false;
   String? dropDownValue;
   int? selectedUserId;

@@ -62,7 +62,7 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
   }
 
   void showTaskDetails(BuildContext context, String title, String description,
-      String start_date, String end_date) {
+      String username, String start_date, String end_date) {
     String formattedStartDate = start_date.split('T')[0];
     String formattedEndDate = end_date.split('T')[0];
 
@@ -76,6 +76,10 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Text('업무 담당자', style: TextStyle(fontWeight: FontWeight.bold)),
+              SizedBox(height: 4),
+              Text(username),
+              SizedBox(height: 10),
               Text('업무 설명', style: TextStyle(fontWeight: FontWeight.bold)),
               SizedBox(height: 4),
               Text(description),
@@ -148,6 +152,7 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
                                     context,
                                     filteredTaskList[index]['title'],
                                     filteredTaskList[index]['description'],
+                                    filteredTaskList[index]['username'],
                                     filteredTaskList[index]['start_date'],
                                     filteredTaskList[index]['end_date']);
                               },
