@@ -32,6 +32,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
   dynamic organization_list = [];
   dynamic role_info = [];
   List<dynamic> notices = [];
+  List<EventItem> taskList = [];
 
   @override
   void initState() {
@@ -39,6 +40,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
     getMyOrganizations();
     getUserInformation();
     getNotices();
+    getTasks();
     setState(() {
       isLoadingComplete = true;
     });
@@ -135,10 +137,40 @@ class _OrganizationHomeState extends State<OrganizationHome> {
     );
   }
 
+  Future<void> getTasks() async {
+    final response = await http.post(
+      Uri.parse("https://172.10.7.95/api/get_tasks"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, String>{
+        'user_id': user_info['user_id'].toString(),
+        'organization_id': org_info['organization_id'].toString(),
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      setState(() {
+        List<dynamic> tasks = jsonDecode(response.body)['tasks'] ?? [];
+        taskList = tasks
+            .map((task) => EventItem(
+                title: task['title'],
+                start: DateTime.parse(task['start_date']),
+                end: DateTime.parse(task['end_date']),
+                group: 'Tasks'))
+            .toList();
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to load tasks')),
+      );
+      throw Exception('Failed to load tasks');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final List<ExampleEventItem> _items =
-        Data.dummyData; // Replace with actual data
+    final List<EventItem> _items = taskList; // Replace with actual data
 
     return !role_info.isNotEmpty
         ? Center(child: CircularProgressIndicator())
@@ -382,60 +414,38 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                         ),
                       ],
                     ),
-                    child: GanttChart<ExampleEventItem>(
-                      rows: _items.toRows(),
-                      style: GanttStyle(
-                        columnWidth: 100,
-                        barHeight: 30,
-                        timelineAxisType: TimelineAxisType.daily,
-                        tooltipType: TooltipType.hover,
-                        taskBarColor: Color(0xFFE4CCFF),
-                        activityLabelColor: Colors.blue.shade500,
-                        taskLabelColor: Color(0xFFD1EBFF),
-                        taskLabelBuilder: (task) => Container(
-                          padding: const EdgeInsets.all(4),
-                          child: Text(
-                            task.data.title,
-                            style: const TextStyle(
-                              fontFamily: 'PlusJakartSans',
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        gridColor: Colors.white,
-                        taskBarRadius: 10,
-                        activityLabelBuilder: (activity) {
-                          return Container(
-                            padding: const EdgeInsets.all(4),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  activity.label!,
+                    child: taskList.isNotEmpty
+                        ? GanttChart<EventItem>(
+                            rows: _items.toRows(),
+                            style: GanttStyle(
+                              columnWidth: 100,
+                              barHeight: 30,
+                              timelineAxisType: TimelineAxisType.daily,
+                              tooltipType: TooltipType.hover,
+                              taskBarColor: Color(0xFFE4CCFF),
+                              activityLabelColor: Colors.blue.shade500,
+                              taskLabelColor: Color(0xFFD1EBFF),
+                              taskLabelBuilder: (task) => Container(
+                                padding: const EdgeInsets.all(4),
+                                child: Text(
+                                  task.data.title,
                                   style: const TextStyle(
+                                    fontFamily: 'PlusJakartSans',
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: Colors.black,
                                   ),
                                 ),
-                                const Text(
-                                  'A subtitle',
-                                  style: TextStyle(
-                                    fontStyle: FontStyle.italic,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ],
+                              ),
+                              gridColor: Colors.white,
+                              taskBarRadius: 10,
+                              axisDividerColor: Colors.white,
+                              tooltipColor: Color(0xFF495ECA),
+                              tooltipPadding: const EdgeInsets.symmetric(
+                                  horizontal: 8.0, vertical: 4.0),
+                              weekendColor: Color(0xFFF4EDF5),
                             ),
-                          );
-                        },
-                        axisDividerColor: Colors.white,
-                        tooltipColor: Color(0xFF495ECA),
-                        tooltipPadding: const EdgeInsets.symmetric(
-                            horizontal: 8.0, vertical: 4.0),
-                        weekendColor: Color(0xFFF4EDF5),
-                      ),
-                    ),
+                          )
+                        : Center(child: Text('진행 중인 업무가 없습니다.')),
                   ),
                 ],
               ),
@@ -632,14 +642,13 @@ class NoticeCard extends StatelessWidget {
   }
 }
 
-// 데이터 모델 예제입니다. 실제 데이터에 맞게 수정해주세요.
-class ExampleEventItem {
+class EventItem {
   final String title;
   final DateTime start;
   final DateTime end;
   final String group;
 
-  ExampleEventItem({
+  EventItem({
     required this.title,
     required this.start,
     required this.end,
@@ -647,43 +656,18 @@ class ExampleEventItem {
   });
 }
 
-class Data {
-  static List<ExampleEventItem> dummyData = [
-    ExampleEventItem(
-      title: 'Task 1',
-      start: DateTime(2022, 6, 7),
-      end: DateTime(2022, 6, 10),
-      group: 'Group 1',
-    ),
-    ExampleEventItem(
-      title: 'Task 2',
-      start: DateTime(2022, 6, 11),
-      end: DateTime(2022, 6, 13),
-      group: 'Group 1',
-    ),
-    ExampleEventItem(
-      title: 'Task 3',
-      start: DateTime(2022, 6, 14),
-      end: DateTime(2022, 6, 18),
-      group: 'Group 2',
-    ),
-  ];
-}
-
 extension on DateTime {
   String get formattedDate => '$year/$month/$day';
 }
 
-extension on List<ExampleEventItem> {
+extension on List<EventItem> {
   List<GridRow> toRows() {
     List<GridRow> rows = [];
-    Map<String, List<TaskGridRow<ExampleEventItem>>> labelTasks = {};
-
-    sort((a, b) => a.start.compareTo(b.start));
+    Map<String, List<TaskGridRow<EventItem>>> labelTasks = {};
 
     for (var item in this) {
       final label = item.group;
-      (labelTasks[label] ??= []).add(TaskGridRow<ExampleEventItem>(
+      (labelTasks[label] ??= []).add(TaskGridRow<EventItem>(
         data: item,
         startDate: item.start,
         endDate: item.end,

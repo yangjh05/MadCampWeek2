@@ -39,6 +39,7 @@ class _OrganizationTaskListState extends State<OrganizationTaskList> {
     if (response.statusCode == 200) {
       setState(() {
         taskList = jsonDecode(response.body)['tasks'];
+        print(taskList);
       });
     } else {
       throw Exception('Failed to load tasks');
