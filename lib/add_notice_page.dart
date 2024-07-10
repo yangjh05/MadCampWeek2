@@ -92,7 +92,7 @@ class _AddNoticePageState extends State<AddNoticePage> {
         ],
       ),
       backgroundColor: Colors.white,
-      body: Padding(
+      body: SingleChildScrollView(
         padding: EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -111,17 +111,17 @@ class _AddNoticePageState extends State<AddNoticePage> {
               style: TextStyle(fontSize: 24.0, fontWeight: FontWeight.bold),
             ),
             Divider(color: Colors.grey),
-            Expanded(
-              child: TextField(
-                controller: _contentController,
-                decoration: InputDecoration(
-                  hintText: '내용을 입력하세요.',
-                  hintStyle: TextStyle(color: Colors.grey),
-                  border: InputBorder.none,
-                ),
-                maxLines: null,
-                expands: true,
+            TextField(
+              controller: _contentController,
+              decoration: InputDecoration(
+                hintText: '내용을 입력하세요.',
+                hintStyle: TextStyle(color: Colors.grey),
+                border: InputBorder.none,
               ),
+              maxLines: null,
+              minLines: 10,
+              keyboardType: TextInputType.multiline,
+              expands: false,
             ),
           ],
         ),

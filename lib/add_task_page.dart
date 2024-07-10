@@ -25,7 +25,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     getSubTree();
   }
@@ -130,7 +129,8 @@ class _AddTaskPageState extends State<AddTaskPage> {
           ),
         ),
         backgroundColor: Colors.white,
-        body: Center(
+        body: SingleChildScrollView(
+            child: Center(
           child: Padding(
             padding: const EdgeInsets.all(20.0),
             child: Form(
@@ -233,6 +233,6 @@ class _AddTaskPageState extends State<AddTaskPage> {
               ),
             ),
           ),
-        ));
+        )));
   }
 }

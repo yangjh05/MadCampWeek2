@@ -28,6 +28,9 @@ class _OrganizationHomeState extends State<OrganizationHome> {
   double appbarHeight = 0.30;
   bool isLoadingComplete = false;
   String? dropDownValue;
+  int? selectedUserId;
+  bool isOrgDelete = false;
+  bool conti = false;
 
   dynamic organization_list = [];
   dynamic role_info = [];
@@ -44,6 +47,25 @@ class _OrganizationHomeState extends State<OrganizationHome> {
     setState(() {
       isLoadingComplete = true;
     });
+  }
+
+  Future<void> updateUserState(int userId) async {
+    final response = await http.post(
+      Uri.parse("https://172.10.7.95/api/update_user_state"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, int>{
+        'user_id': userId,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('User state updated');
+      // 필요한 경우 UI 업데이트 등 추가 작업 수행
+    } else {
+      print('Failed to update user state');
+    }
   }
 
   void getMyOrganizations() async {
@@ -450,8 +472,57 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                 ],
               ),
             ),
-            floatingActionButton: org_info['user_state'] == 2
+            floatingActionButton: org_info['user_state'] != 2
                 ? SpeedDial(
+                    animatedIcon: AnimatedIcons.menu_close,
+                    backgroundColor: Color(0xfff9e2af),
+                    icon: Icons.settings,
+                    spaceBetweenChildren: 15.0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16.0)),
+                    children: [
+                      SpeedDialChild(
+                        child: Icon(
+                          Icons.delete_outline,
+                          size: 20.0,
+                          color: Colors.white, // 아이콘 색상
+                        ),
+                        backgroundColor:
+                            Color.fromARGB(255, 243, 61, 33), // 버튼 배경색
+                        foregroundColor: Colors.white, // 텍스트 색상
+                        label: '단체 탈퇴하기',
+                        onTap: () async {
+                          final response = await http.post(
+                              Uri.parse(
+                                  "https://172.10.7.95/api/delete_subtree"),
+                              headers: <String, String>{
+                                'Content-Type':
+                                    'application/json; charset=UTF-8',
+                              },
+                              body: jsonEncode(<String, String>{
+                                'user_id': user_info['user_id'].toString(),
+                                'organization_id':
+                                    org_info['organization_id'].toString(),
+                              }));
+
+                          if (response.statusCode == 200) {
+                            setState(() {
+                              print(response.body);
+                            });
+                            Navigator.of(context).pop();
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Failed to get response: ${response.body}')),
+                            );
+                            throw Exception();
+                          }
+                        },
+                      )
+                    ],
+                  )
+                : SpeedDial(
                     animatedIcon: AnimatedIcons.menu_close,
                     backgroundColor: Color(0xfff9e2af),
                     icon: Icons.settings,
@@ -509,55 +580,24 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                         foregroundColor: Colors.white, // 텍스트 색상
                         label: '단체 탈퇴하기',
                         onTap: () async {
-                          final response = await http.post(
-                              Uri.parse(
-                                  "https://172.10.7.95/api/delete_subtree"),
+                          if (org_info['user_state'] == 2) {
+                            final managers = await http.post(
+                              Uri.parse("https://172.10.7.95/api/get_managers"),
                               headers: <String, String>{
                                 'Content-Type':
                                     'application/json; charset=UTF-8',
                               },
                               body: jsonEncode(<String, String>{
-                                'user_id': user_info['user_id'].toString(),
-                              }));
-
-                          if (response.statusCode == 200) {
-                            setState(() {
-                              print(response.body);
-                            });
-                            Navigator.of(context).pop();
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                  content: Text(
-                                      'Failed to get response: ${response.body}')),
+                                'organization_id':
+                                    org_info['organization_id'].toString()
+                              }),
                             );
-                            throw Exception();
-                          }
-                        },
-                      )
-                    ],
-                  )
-                : SpeedDial(
-                    animatedIcon: AnimatedIcons.menu_close,
-                    backgroundColor: Color(0xfff9e2af),
-                    icon: Icons.settings,
-                    spaceBetweenChildren: 15.0,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16.0)),
-                    children: [
-                      SpeedDialChild(
-                        child: Icon(
-                          Icons.delete_outline,
-                          size: 20.0,
-                          color: Colors.white, // 아이콘 색상
-                        ),
-                        backgroundColor:
-                            Color.fromARGB(255, 243, 61, 33), // 버튼 배경색
-                        foregroundColor: Colors.white, // 텍스트 색상
-                        label: '단체 탈퇴하기',
-                        onTap: () async {
-                          if (org_info['user_state'] == 2) {
-                            final managers = await http.post(
+                            print("Managers");
+                            print(managers.body);
+                            final manager_list =
+                                jsonDecode(managers.body)['users'];
+                            if (manager_list.length == 1) {
+                              final non_managers = await http.post(
                                 Uri.parse(
                                     "https://172.10.7.95/api/get_nonmanager_users"),
                                 headers: <String, String>{
@@ -565,36 +605,28 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                                       'application/json; charset=UTF-8',
                                 },
                                 body: jsonEncode(<String, String>{
-                                  'organization_id': org_info['organization_id']
-                                }));
-                            final manager_list =
-                                jsonDecode(managers.body)['users'];
-                            if (manager_list.length == 1) {
-                              final non_managers = await http.post(
-                                  Uri.parse(
-                                      "https://172.10.7.95/api/get_nonmanager_users"),
-                                  headers: <String, String>{
-                                    'Content-Type':
-                                        'application/json; charset=UTF-8',
-                                  },
-                                  body: jsonEncode(<String, String>{
-                                    'organization_id':
-                                        org_info['organization_id']
-                                  }));
+                                  'user_id': user_info['user_id'].toString(),
+                                  'organization_id':
+                                      org_info['organization_id'].toString()
+                                }),
+                              );
                               final non_manager_list =
                                   jsonDecode(non_managers.body)['users'];
                               if (non_manager_list.length == 0) {
-                                showDialog(
+                                await showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
                                       title: Text('경고'),
-                                      content: Text(
-                                          '당신이 마지막 남은 회원입니다. 당신이 탈퇴하면 단체가 삭제됩니다. 계속하시겠습니까?'),
+                                      content:
+                                          Text('당신이 탈퇴하면 단체가 삭제됩니다. 계속하시겠습니까?'),
                                       actions: <Widget>[
                                         TextButton(
                                           child: Text('취소'),
                                           onPressed: () {
+                                            setState(() {
+                                              conti = false;
+                                            });
                                             Navigator.of(context).pop();
                                             return;
                                           },
@@ -602,6 +634,10 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                                         TextButton(
                                           child: Text('계속'),
                                           onPressed: () {
+                                            setState(() {
+                                              conti = true;
+                                              isOrgDelete = true;
+                                            });
                                             Navigator.of(context).pop();
                                           },
                                         ),
@@ -609,26 +645,110 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                                     );
                                   },
                                 );
+                              } else {
+                                await showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return StatefulBuilder(
+                                      builder: (BuildContext context,
+                                          StateSetter setState) {
+                                        return AlertDialog(
+                                          title: Text('경고'),
+                                          content: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: <Widget>[
+                                              Text(
+                                                  '당신이 유일한 관리자입니다. 관리자 권한을 넘길 유저를 선택하세요.'),
+                                              DropdownButton<int>(
+                                                hint: Text('사용자를 선택하세요'),
+                                                value: selectedUserId,
+                                                onChanged: (int? newValue) {
+                                                  setState(() {
+                                                    selectedUserId = newValue;
+                                                  });
+                                                },
+                                                items: non_manager_list
+                                                    .map<DropdownMenuItem<int>>(
+                                                        (user) {
+                                                  return DropdownMenuItem<int>(
+                                                    value: user['user_id'],
+                                                    child:
+                                                        Text(user['username']),
+                                                  );
+                                                }).toList(),
+                                              ),
+                                            ],
+                                          ),
+                                          actions: <Widget>[
+                                            TextButton(
+                                              child: Text('취소'),
+                                              onPressed: () {
+                                                setState(() {
+                                                  conti = false;
+                                                });
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: Text('확인'),
+                                              onPressed: () {
+                                                if (selectedUserId != null) {
+                                                  updateUserState(
+                                                      selectedUserId!);
+                                                  setState(() {
+                                                    conti = true;
+                                                  });
+                                                  Navigator.of(context).pop();
+                                                } else {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                        content:
+                                                            Text('사용자를 선택하세요')),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                );
                               }
                             }
                           }
+                          if (!conti) return;
                           final response = await http.post(
-                              Uri.parse(
-                                  "https://172.10.7.95/api/delete_subtree"),
-                              headers: <String, String>{
-                                'Content-Type':
-                                    'application/json; charset=UTF-8',
-                              },
-                              body: jsonEncode(<String, String>{
-                                'user_id': user_info['user_id'].toString(),
-                                'organization_id':
-                                    org_info['organization_id'].toString(),
-                              }));
+                            Uri.parse("https://172.10.7.95/api/delete_subtree"),
+                            headers: <String, String>{
+                              'Content-Type': 'application/json; charset=UTF-8'
+                            },
+                            body: jsonEncode(<String, String>{
+                              'user_id': user_info['user_id'].toString(),
+                              'organization_id':
+                                  org_info['organization_id'].toString(),
+                            }),
+                          );
 
                           if (response.statusCode == 200) {
                             setState(() {
                               print(response.body);
                             });
+                            if (isOrgDelete) {
+                              await http.post(
+                                Uri.parse(
+                                    "https://172.10.7.95/api/delete_organization"),
+                                headers: <String, String>{
+                                  'Content-Type':
+                                      'application/json; charset=UTF-8'
+                                },
+                                body: jsonEncode(<String, String>{
+                                  'organization_id':
+                                      org_info['organization_id'].toString(),
+                                }),
+                              );
+                            }
                             Navigator.of(context).pushReplacement(
                               MaterialPageRoute(
                                 builder: (context) {
@@ -645,7 +765,7 @@ class _OrganizationHomeState extends State<OrganizationHome> {
                             throw Exception();
                           }
                         },
-                      )
+                      ),
                     ],
                   ),
           );

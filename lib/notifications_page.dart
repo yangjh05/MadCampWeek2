@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 
 class NotificationsTab extends StatefulWidget {
   final user_info;
@@ -38,6 +39,13 @@ class _NotificationsTabState extends State<NotificationsTab> {
     if (response.statusCode == 200) {
       setState(() {
         notifications = jsonDecode(response.body)['res'][0] ?? [];
+        notifications = notifications.map((notification) {
+          return {
+            ...notification,
+            'date': DateTime.parse(notification['date']),
+          };
+        }).toList();
+        notifications.sort((a, b) => b['date'].compareTo(a['date']));
         isLoading = false;
       });
       print(notifications);
@@ -49,6 +57,36 @@ class _NotificationsTabState extends State<NotificationsTab> {
         isLoading = false;
       });
     }
+  }
+
+  void _showNotificationDetails(
+      BuildContext context, Map<dynamic, dynamic> notification) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(notification['title']),
+          content: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                  '일시: ${DateFormat('yyyy-MM-dd – kk:mm').format(notification['date'])}'),
+              SizedBox(height: 8.0),
+              Text('Description: ${notification['description']}'),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -96,16 +134,62 @@ class _NotificationsTabState extends State<NotificationsTab> {
                   child: ListView.builder(
                     itemCount: notifications.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        leading: Icon(Icons.notifications),
-                        title: Text(
-                          notifications[index]['title'],
-                          style: TextStyle(
-                              color: notifications[index]['notice_type'] == 0
-                                  ? Colors.red
-                                  : Colors.green),
+                      var notification = notifications[index];
+                      return GestureDetector(
+                        onTap: () {
+                          _showNotificationDetails(context, notification);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      Icon(Icons.notifications),
+                                      SizedBox(width: 8.0),
+                                      Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            notification['title'],
+                                            style: TextStyle(
+                                              color:
+                                                  notification['notice_type'] ==
+                                                          0
+                                                      ? Colors.red
+                                                      : Colors.green,
+                                            ),
+                                          ),
+                                          Text(DateFormat('yyyy-MM-dd – kk:mm')
+                                              .format(notification['date'])),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
+                                  Container(
+                                    constraints: BoxConstraints(
+                                        maxWidth: 150), // 최대 너비 설정
+                                    child: Text(
+                                      notification['description'],
+                                      overflow: TextOverflow
+                                          .ellipsis, // 텍스트가 길 경우 말줄임표 표시
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
-                        subtitle: Text(notifications[index]['description']),
                       );
                     },
                   ),

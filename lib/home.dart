@@ -232,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _collapseDraggableScrollableSheet() {
     _draggableScrollableController.animateTo(
-      _selectedIndex == 1 ? 0.1 : 0.074, // 초기 크기로 설정
+      _selectedIndex == 1 ? 0.12 : 0.074 * 1.2, // 초기 크기로 설정
       duration: Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
@@ -296,8 +296,8 @@ class _HomeScreenState extends State<HomeScreen>
               _widgetOptions().elementAt(_selectedIndex),
               DraggableScrollableSheet(
                 controller: _draggableScrollableController,
-                initialChildSize: _selectedIndex == 1 ? 0.1 : 0.074,
-                minChildSize: _selectedIndex == 1 ? 0.1 : 0.074,
+                initialChildSize: _selectedIndex == 1 ? 0.12 : 0.074 * 1.2,
+                minChildSize: _selectedIndex == 1 ? 0.12 : 0.074 * 1.2,
                 maxChildSize: 0.96,
                 builder:
                     (BuildContext context, ScrollController scrollController) {
