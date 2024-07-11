@@ -1,4 +1,4 @@
-package com.example.madcamp_week2
+package com.example.MOM
 
 import io.flutter.embedding.android.FlutterActivity
 
